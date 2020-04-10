@@ -6,9 +6,12 @@ import * as socketio from 'socket.io';
 import cors from 'cors';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import cookieParser from 'cookie-parser'
+import { v4 as uuidv4 } from 'uuid';
+import { SocketEvent } from '../client/src/common';
+
 
 import querystring from 'query-string';
-import { User } from '../models/User';
+import { User, Party } from '../client/src/common';
 import { generateRandomString } from '../helpers/helpers'
 import Axios from "axios";
 
@@ -28,6 +31,7 @@ interface SpotifyTokenResponse {
 }
 
 
+
 export class Server {
 
     private app: Express;
@@ -36,16 +40,57 @@ export class Server {
     private io: socketio.Server;
     private port: number;
 
-    private users: User[] = [];
+
+    private totalUsers: number;
+    private partyMap = new Map<string, Party>();
+    private userMap = new Map<string, string>();
 
     private stateKey = 'spotify_auth_state';
 
-    public callback = (req: Request, res: Response): Promise<any> => {
+    constructor(app: Express) {
+        this.app = app;
 
+        this.app.use(express.static(path.resolve("./") + FE_PATH));
+        this.app.use(cors())
+        this.app.use(cookieParser())
+
+        this.app.get("/login", (req: Request, res: Response): void => {
+            console.log('loggin in ')
+
+            const state = generateRandomString(16);
+            res.cookie(this.stateKey, state);
+
+            const scopes = ['user-read-private', 'user-modify-playback-state', 'user-read-currently-playing', 'user-read-playback-state'];
+            const authURL = SPOTIFY_AUTH_URL + '?' +
+                querystring.stringify({
+                    response_type: 'code',
+                    client_id: CLIENT_ID,
+                    scope: scopes.join(' '),
+                    redirect_uri: REDIRECT_URL,
+                    state: state
+                });
+            res.redirect(authURL);
+        });
+
+        this.app.get('/callback', this.authenticate);
+
+        this.app.get('*', (req: Request, res: Response): void => {
+            res.sendFile(path.resolve("./") + FE_PATH)
+        });
+    }
+
+    public start(port: number): void {
+        this.port = port;
+        this.server = this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
+        this.setUpSocket();
+    }
+
+    public authenticate = (req: Request, res: Response): Promise<any> => {
         const code = req.query.code || null;
         const state = req.query.state || null;
         const storedState = req.cookies ? req.cookies[this.stateKey] : null;
 
+        console.log(code);
         if (state === null || state !== storedState) {
             res.redirect('/#' +
                 querystring.stringify({
@@ -69,72 +114,112 @@ export class Server {
             }
         }).then((response: AxiosResponse<SpotifyTokenResponse>) => {
             res.clearCookie(this.stateKey);
-            console.log(response.data);
-            res.redirect('/home');
 
+
+            res.redirect(`/#` + querystring.stringify({
+                access_token: response.data.access_token,
+                refresh_token: response.data.refresh_token
+            }));
         }).catch(error => {
             console.log(error.response.data);
             console.log(error.response.status);
         })
-
-        // const options = {
-        //     url: 'https://api.spotify.com/v1/me',
-        //     headers: { 'Authorization': 'Bearer ' + access_token },
-        //     json: true
-        // };
-
     }
 
+    private setUpSocket(): void {
+        this.io = socketio.listen(this.server, { origins: '*:*' });
+        this.io.on("connection", (socket: socketio.Socket) => {
+            console.log("Connected client on port:", this.port);
+            socket.on(SocketEvent.USER_CONNECTED_REQ, (userId) => {
+                this.userMap.set(socket.id, userId);
+            });
 
-    constructor(app: Express) {
-        this.app = app;
+            // socket.on(SocketEvent.USER_DISCONNECTED_REQ, (user) => {
+            //     this.userMap.delete(user.id);
+            // });
 
-        this.app.use(express.static(path.resolve("./") + FE_PATH));
-        this.app.use(cors())
-        this.app.use(cookieParser())
+            socket.on('reconnect', () => {
+                console.log('reconnecting')
+            })
 
-        this.app.get("/login", (req: Request, res: Response): void => {
-            // res.send("You have reached the API!");
+            socket.on("newconnection", (user: User) => {
 
-            const state = generateRandomString(16);
-            res.cookie(this.stateKey, state);
+                // console.log('logged in', user);
+                // this.io.emit('newconnection', user);
+            });
 
-            const scopes = ['user-read-private', 'user-modify-playback-state', 'user-read-currently-playing', 'user-read-playback-state'];
-            const authURL = SPOTIFY_AUTH_URL + '?' +
-                querystring.stringify({
-                    response_type: 'code',
-                    client_id: CLIENT_ID,
-                    scope: scopes.join(' '),
-                    redirect_uri: REDIRECT_URL,
-                    state: state
-                });
-            res.redirect(authURL);
+            socket.on('unsubscribe', () => {
+
+            });
+
+            socket.on("disconnect", () => {
+                console.log("Client disconnected");
+            });
+
+            socket.on("disconnecting", () => {
+                // console.log('buddy leaving the party')
+                removeUserFromParty();
+            });
+
+            socket.on(SocketEvent.CREATE_PARTY_REQ, socketId => {
+                const newParty: Party = {
+                    id: uuidv4(),
+                    users: [],
+                    queue: []
+                }
+                this.partyMap.set(newParty.id, newParty);
+                // console.log('made new party: ', newParty);
+                this.io.to(socketId).emit(SocketEvent.CREATE_PARTY_RES, newParty.id);
+            })
+
+            socket.on(SocketEvent.PARTY_JOINED_REQ, ({ user, socketId, partyId }) => {
+                console.log(`${user.id} trying to join ${partyId}`)
+
+                if (!this.partyMap.has(partyId)) {
+                    this.io.to(socketId).emit(SocketEvent.PARTY_NOT_FOUND_RES);
+                    return;
+                }
+
+                const currentParty = this.partyMap.get(partyId);
+                if (!currentParty.users.find(userInParty => userInParty.id === user.id)) {
+                    currentParty.users.push(user);
+                }
+
+                socket.join(partyId);
+                this.io.to(partyId).emit(SocketEvent.PARTY_JOINED_RES, currentParty)
+            });
+
+            // socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, ({ socketId, partyId }) => {
+            //     let response = null;
+            //     if (this.partyMap.has(partyId)) {
+            //         response = this.partyMap.get(partyId);
+            //     }
+            //     this.io.to(socketId).emit(SocketEvent.PARTY_JOINED_UNAUTHED_RES, response);
+            // });
+
+            socket.on(SocketEvent.USER_LEFT_PARTY_REQ, () => {
+                removeUserFromParty();
+            })
+
+            const removeUserFromParty = () => {
+                const parties = Object.keys(socket.rooms).filter(room => room != socket.id);
+                if (parties.length > 0) {
+                    for (let partyId of parties) {
+                        if (this.partyMap.has(partyId)) {
+                            const partyState = this.partyMap.get(partyId);
+                            const userIdToDisconnect = this.userMap.get(socket.id);
+                            partyState.users = partyState.users.filter(u => u.id !== userIdToDisconnect);
+                            this.io.to(partyId).emit(SocketEvent.USER_LEFT_PARTY_RES, partyState);
+                        }
+                    }
+                }
+                this.userMap.delete(socket.id);
+            }
+
+            const joinUserToParty = () => {
+
+            }
         });
-
-        this.app.get('/callback', this.callback);
-
-        this.app.get("*", (req: Request, res: Response): void => {
-            res.sendFile(path.resolve("./") + `${FE_PATH}/index.html`);
-        });
     }
 
-    public start(port: number): void {
-        this.port = port;
-        this.server = this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
-        // this.io = socketio.listen(this.server, { origins: '*:*' });
-        // this.io.on("connection", (socket: any) => {
-        //     console.log("Connected client on port:", this.port);
-
-        //     socket.on("login", (user: User) => {
-        //         this.users.push(user);
-        //         console.log('logged in', user);
-        //         console.log('users:', this.users);
-        //     });
-
-        //     socket.on("disconnect", () => {
-        //         console.log("Client disconnected");
-        //     });
-        // });
-        // console.log(socketio);
-    }
 }

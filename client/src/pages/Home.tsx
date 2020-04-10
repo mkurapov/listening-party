@@ -1,51 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import { SocketEvent, Party } from '../common';
 
-import axios from 'axios';
 import Button from '../components/Button';
-import API_ENDPOINTS from '../endpoints';
-// import { getHashParams } from '../../../helpers/helpers';
+import { useUser } from '../contexts/UserContext';
+import { APP_URL } from '../const';
+import socket from '../socket';
 
-interface AuthHashParams {
-    access_token: string;
-    token_type: string;
-    expires_in: string;
-}
 
 const Home = (): React.ReactElement => {
-    // const clientId = 'ac96599f92324f9ea5a9f0e80f48b9a4';
-    // let location = useLocation();
-    // const scopes = ['user-read-private', 'user-modify-playback-state', 'user-read-currently-playing', 'user-read-playback-state'];
-    // // const state = '';
-    // const redirectUri = 'http://localhost:3000/';
-    // const authURL = `https://accounts.spotify.com/authorize?response_type=token&client_id=${encodeURIComponent(clientId)}&scope=${encodeURIComponent(scopes.join('%20'))}&redirect_uri=${encodeURIComponent(redirectUri)}`
+    const LOGIN_URL = APP_URL + '/login';
+    const history = useHistory();
+    const { user, logout } = useUser();
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    useEffect(() => {
+        socket.on(SocketEvent.CREATE_PARTY_RES, (newPartyId: Party) => {
+            history.push('/party/' + newPartyId)
+        });
 
-    // useEffect(() => {
-    //     if (!location.hash) return;
 
-    //     setIsLoggedIn(true);
+    }, [])
 
-    //     let locationArgs: AuthHashParams = getHashParams(location.hash);
-    //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + locationArgs.access_token;
-    // });
 
-    // if (!isLoggedIn) {
-    //     return (<div>
-    //         <a href={authURL}> Login </a>
-    //     </div>);
-    // }
-
-    const getCurrentlyPlaying = async () => {
-        const userResponse = await axios.get(API_ENDPOINTS.CURRENT_PLAYBACK);
-        console.log(userResponse.data);
+    const createRoom = (): void => {
+        socket.emit(SocketEvent.CREATE_PARTY_REQ, socket.id);
     }
 
     return (<div>
-        YOU ARE AT HOME
-       
-    </div>)
+        {user && user.id ?
+            <div>
+                <div>Hi, {user.id}!</div>
+                <Button name="Logout" onClick={logout}></Button>
+                <Button name="Create new Room" onClick={createRoom}></Button>
+            </div>
+            :
+            <a href={LOGIN_URL}>Login</a>}
+    </div>);
 
 };
 
