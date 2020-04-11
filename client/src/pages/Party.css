@@ -1,0 +1,56 @@
+.user-wrap {
+    position: absolute;
+    text-align: center;
+    left:0;right:0;margin:0 auto;
+    bottom:50px;
+  }
+
+.users {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 1rem;
+    /* width: 100px; */
+}
+
+.avatar__name {
+    font-weight: bold;
+}
+
+.avatar__img, .avatar__placeholder {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.avatar__placeholder {
+    background-color: blueviolet;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar__placeholder__letter {
+    color:white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.song {
+    max-width: 400px;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.party-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+}

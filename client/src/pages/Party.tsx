@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import io from 'socket.io-client'
 import { SocketEvent, Party, PlaybackState } from '../common';
 import axios, { AxiosResponse } from 'axios';
-import Button from '../components/Button';
-import { getHashParams } from '../helpers/helpers';
-import { withRouter, match, useHistory } from 'react-router';
+import { match, useHistory } from 'react-router';
 
 import { useUser } from '../contexts/UserContext';
 import socket from '../socket';
 import { User } from '../common';
 import { SPOTIFY_API } from '../const';
-import '../App.css'
+import './Party.css'
 
 interface Props {
     match: any;
@@ -21,6 +17,30 @@ const imageStyle = {
     // width: '100vw',
     height: '300px'
 }
+
+const Player: React.FC<{ playback: PlaybackState }> = ({ playback }): React.ReactElement => {
+    return (
+        <div>
+            <h3 className="song mb-2">{playback?.item.name} by {playback?.item.album.artists[0].name}</h3>
+            <img style={imageStyle} src={playback.item.album.images[0].url}></img>
+            <h3>{playback.is_playing ? 'Playing' : 'Paused'}</h3>
+        </div>
+    )
+};
+
+const UserAvatar: React.FC<{ user: User; isAdmin: boolean }> = ({ user, isAdmin }): React.ReactElement => {
+    return <span className="avatar">
+        {user.images.length > 0 ?
+            <img className="avatar__img" src={user.images[0].url}></img>
+            :
+            <span className="avatar__placeholder">
+                <span className="avatar__placeholder__letter">{user.display_name.substr(0, 1)}</span>
+
+            </span>
+        }
+        <span className="avatar__name">{user.display_name} {isAdmin ? '(DJ)' : ''}</span>
+    </span>
+};
 
 const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const { user, isLoading } = useUser();
@@ -118,7 +138,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             getCurrentlyPlaying(party.id);
             pollCurrentlyPlaying = setInterval(() => {
                 getCurrentlyPlaying(party.id);
-            }, 2000);
+            }, 10000);
         }
         setCurrentParty(party);
     }
@@ -189,21 +209,19 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     // }
 
     return (
-        <div>
+        <div className="party-wrap">
             {user && user.id ?
                 <div>
-                    <h2>Welcome to the party {user.display_name} 🎉</h2>
-                    <h2 className="subheading">{currentParty?.adminUser?.display_name === user.display_name ? 'You are the DJ.' : `Your DJ is ${currentParty?.adminUser?.display_name}`}</h2>
+                    <h2 className="mb-2">Welcome to the party {user.display_name} 🎉</h2>
                     {currentParty?.playbackState ?
-                        <div>
-                            <h3>Playing {currentParty?.playbackState?.item.name} by {currentParty?.playbackState?.item.album.artists[0].name}</h3>
-                            <img style={imageStyle} src={currentParty.playbackState.item.album.images[0].url}></img>
-                            <h3>{currentParty.playbackState.is_playing ? 'Playing' : 'Paused'}</h3>
-                        </div>
+                        <Player playback={currentParty.playbackState} />
                         :
                         <div>No tracks playing</div>
                     }
-                    <h2 className="users">People in the party are {currentParty?.users?.map(user => user.display_name).join(', ')}</h2>
+                    <div className="user-wrap">
+                        <h2>People in the party are</h2>
+                        <div className="users">{currentParty?.users?.map(user => <UserAvatar key={user.id} isAdmin={user.id === currentParty.adminUser?.id} user={user} />)}</div>
+                    </div>
                 </div>
                 :
                 <div>This is a party, but you aint authed.</div>}
@@ -212,3 +230,5 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 };
 
 export default PartyPage;
+
+
