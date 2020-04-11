@@ -8,6 +8,8 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import cookieParser from 'cookie-parser'
 import { v4 as uuidv4 } from 'uuid';
 import { SocketEvent, PlaybackState } from '../client/src/common';
+import dotenv from 'dotenv';
+dotenv.config()
 
 
 import querystring from 'query-string';
@@ -21,8 +23,7 @@ const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
 const SPOTIFY_TOKEN_URL = SPOTIFY_ACCOUNT_URL + '/api/token';
 
-const CLIENT_ID = 'ac96599f92324f9ea5a9f0e80f48b9a4';
-const CLIENT_SECRET = '104d17c7173e4cce98a5efbe5d5efdbd';
+
 const REDIRECT_URL = 'http://localhost:8080/callback';
 
 interface SpotifyTokenResponse {
@@ -77,7 +78,7 @@ export class Server {
         const authURL = SPOTIFY_AUTH_URL + '?' +
             querystring.stringify({
                 response_type: 'code',
-                client_id: CLIENT_ID,
+                client_id: process.env.CLIENT_ID,
                 scope: scopes.join(' '),
                 redirect_uri: REDIRECT_URL,
                 state: state
@@ -105,8 +106,8 @@ export class Server {
                 code: code,
                 redirect_uri: REDIRECT_URL,
                 grant_type: 'authorization_code',
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET
+                client_id: process.env.CLIENT_ID,
+                client_secret: process.env.CLIENT_SECRET
             },
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -134,8 +135,8 @@ export class Server {
             params: {
                 grant_type: 'refresh_token',
                 refresh_token: refresh_token,
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET
+                client_id: process.env.CLIENT_ID,
+                client_secret: process.env.CLIENT_SECRET
             },
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
