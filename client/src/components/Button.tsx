@@ -5,13 +5,18 @@ interface Props {
     name: string;
 }
 
+const styles = {
+    'font-size': '20px',
+    'padding': '10px 20px'
+}
+
 const Button: React.FC<Props> = ({
     name,
     onClick,
 }): React.ReactElement => {
 
     return (
-        <button onClick={onClick}>{name}</button>
+        <button style={styles} onClick={onClick}>{name}</button>
     );
 };
 

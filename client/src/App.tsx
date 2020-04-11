@@ -10,16 +10,16 @@ import { UserProvider } from './contexts/UserContext';
 function App() {
   return (
     <UserProvider>
-        <div className="App">
-          <header className="App-header">
-          </header>
-          <Switch>
-            <Route exact path='/'>
-              <Home></Home>
-            </Route>
-            <Route path='/party/:id'  component={PartyPage}/ >
-          </Switch>
-        </div>
+      <div className="App">
+        {/* <header className="App-header">
+          </header> */}
+        <Switch>
+          <Route exact path='/'>
+            <Home></Home>
+          </Route>
+          <Route path='/party/:id' component={PartyPage} />
+        </Switch>
+      </div>
     </UserProvider>
   );
 }

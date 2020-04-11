@@ -7,3 +7,7 @@ export const getHashParams = <T>(hashInput: string): T => {
     });
     return params as T;
 }
+
+export const getTimeWithMinutesOffset = (minutes: number): Date => {
+    return new Date(new Date().getTime() + (minutes * 60 * 1000))
+}

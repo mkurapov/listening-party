@@ -8,3 +8,4 @@ export const generateRandomString = (length: number): string => {
     }
     return text;
 }
+
