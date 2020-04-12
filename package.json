@@ -27,7 +27,7 @@
     "build:dev": "npx tsc && yarn build:client:dev",
     "build:client:dev": "cd client/ && yarn build:dev",
     "build:client:prod": "cd client/ && yarn build:prod",
-    "build:common": "cd common/ && npx tsc",
+    "build:common": "cd common/ && yarn link && npx tsc",
     "watch": "NODE_ENV=dev nodemon --watch 'app/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
     "heroku-build:client": "tsc & cd client/ && yarn link common && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod",
     "heroku-build:common": "cd common/ && npx tsc",
