@@ -20,5 +20,6 @@ var SocketEvent;
     SocketEvent["PARTY_CHANGED_ADMIN_RES"] = "PARTY_CHANGED_ADMIN_RES";
     SocketEvent["PARTY_EXISTS_CHECK_REQ"] = "PARTY_EXISTS_CHECK_REQ";
     SocketEvent["PARTY_EXISTS_CHECK_RES"] = "PARTY_EXISTS_CHECK_RES";
+    SocketEvent["TEST"] = "TEST";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
 //# sourceMappingURL=events.js.map
