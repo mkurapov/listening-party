@@ -6,6 +6,7 @@ import { getHashParams, getTimeWithMinutesOffset } from '../helpers/helpers';
 import { SPOTIFY_API, APP_API } from "../const";
 import socket from "../socket";
 import { User, SocketEvent } from "common";
+import { useHistory } from "react-router";
 
 interface AuthHashParams {
     access_token: string;
@@ -33,22 +34,33 @@ const UserContext = createContext<UserContext>({
 const UserProvider: React.FC = ({ children }): React.ReactElement => {
     const [user, setUser] = useState<User>();
     const [isLoading, setIsLoading] = useState(true);
+    const history = useHistory();
     let storedUser: string | null;
     let storedAccessToken: string | null;
     let storedRefreshToken: string | null;
 
     useEffect(() => {
+        console.log('Checking login...');
+
         storedUser = localStorage.getItem('user');
         storedAccessToken = localStorage.getItem('access_token');
         storedRefreshToken = localStorage.getItem('refresh_token');
 
         if (!storedUser || !storedAccessToken || !storedRefreshToken) {
-            if (!window.location.hash) return;
-            console.log('loggin in ...')
-            login();
+            console.log('No saved user found.')
+            if (!window.location.hash) {
+                console.log('No hash.')
+                setIsLoading(false);
+                return;
+            }
+            console.log('Found hash.')
+            loginCallback();
             return;
         }
 
+        console.log('Using stored user.');
+
+        // Use stored user
         const parsedUser = JSON.parse(storedUser) as User;
 
         const expiryDate = localStorage.getItem('expiry_time');
@@ -64,9 +76,19 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
             setAuthheader(storedAccessToken);
             updateUser(parsedUser);
         }
+        checkIfPendingParty();
     }, [])
 
-    const login = (): void => {
+    const checkIfPendingParty = () => {
+        const pendingPartyId = localStorage.getItem('pending_party');
+        if (pendingPartyId) {
+            console.log('Is trying to join party ', pendingPartyId);
+            history.push('/party/' + pendingPartyId)
+            localStorage.removeItem('pending_party');
+        }
+    }
+
+    const loginCallback = (): void => {
         let locationArgs: AuthHashParams = getHashParams(window.location.hash);
         setAuthheader(locationArgs.access_token);
         axios.get(SPOTIFY_API.ME).then((res: AxiosResponse<User>) => {
@@ -75,6 +97,7 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
             localStorage.setItem('access_token', locationArgs.access_token);
             localStorage.setItem('refresh_token', locationArgs.refresh_token);
             localStorage.setItem('expiry_time', getTimeWithMinutesOffset(1).getTime().toString())
+            checkIfPendingParty();
         });
     }
 

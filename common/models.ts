@@ -1,6 +1,5 @@
 export interface User {
     id: string;
-    name: string;
     display_name: string;
     product: string;
     images: [{

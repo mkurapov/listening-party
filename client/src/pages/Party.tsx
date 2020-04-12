@@ -5,8 +5,9 @@ import { match, useHistory } from 'react-router';
 
 import { useUser } from '../contexts/UserContext';
 import socket from '../socket';
-import { SPOTIFY_API } from '../const';
+import { SPOTIFY_API, APP_API } from '../const';
 import './Party.css'
+import Button from '../components/Button';
 
 interface Props {
     match: any;
@@ -58,39 +59,41 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     useEffect(() => {
         // NEED TO CHECK IF PARTY EXISTS HERE 
-        socket.emit(SocketEvent.PARTY_EXISTS_CHECK_REQ);
+        socket.emit(SocketEvent.PARTY_EXISTS_CHECK_REQ, partyId);
+
+        socket.on(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
+        socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
         return () => handleUserLeaving();
     }, [])
-
-    const registerListeners = () => {
-        socket.on(SocketEvent.USER_LEFT_PARTY_RES, onUserLeftParty);
-        socket.on(SocketEvent.PARTY_PLAYBACK_CHANGED_RES, onPlaybackChanged);
-        socket.on(SocketEvent.PARTY_NOT_FOUND_RES, onPartyNotFound);
-        socket.on(SocketEvent.PARTY_NEW_USER_JOINED_RES, onNewUserJoined);
-        socket.on(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
-        socket.on(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
-        socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
-        socket.on(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
-    }
 
     useEffect(() => {
         if (!user || isLoading) {
             if (!isLoading) {
                 console.log('You are not authed');
-                localStorage.setItem('pendingParty', partyId);
-                socket.emit(SocketEvent.PARTY_JOINED_UNAUTHED_REQ);
+                localStorage.setItem('pending_party', partyId);
+                socket.emit(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, partyId);
             }
             return;
         }
 
         console.log('Logged in as ', user.display_name);
 
-        registerListeners();
+        socket.on(SocketEvent.USER_LEFT_PARTY_RES, onUserLeftParty);
+        socket.on(SocketEvent.PARTY_PLAYBACK_CHANGED_RES, onPlaybackChanged);
+        socket.on(SocketEvent.PARTY_NEW_USER_JOINED_RES, onNewUserJoined);
+        socket.on(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
+        socket.on(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
+
         socket.emit(SocketEvent.PARTY_JOINED_REQ, { user: user, socketId: socket.id, partyId: partyId })
-    }, [user])
+    }, [user, isLoading])
 
     const onPartyExistsCheck = (hasParty: boolean) => {
-        console.log('Do we have party?', hasParty)
+        if (!hasParty) {
+            console.log('This party was not found... redirecting back');
+            setTimeout(() => {
+                history.push('/');
+            }, POLL_TIME);
+        }
     }
 
 
@@ -119,26 +122,21 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     }
 
     const onNewUserJoined = (party: Party) => {
-        console.log('New user joined,', party.users ? party.users[party.users?.length - 1].display_name : '');
+        console.log('New user joined:', party.users ? party.users[party.users?.length - 1].display_name : '');
         setCurrentParty(party);
-    }
-
-    const onPartyNotFound = () => {
-        console.log('This party was not found... redirecting back');
-        setTimeout(() => {
-            history.push('/');
-        }, POLL_TIME);
     }
 
     const onPartyJoined = (party: Party) => {
         setCurrentParty(party);
+        console.log('Joined existing party:', party);
         if (party.playbackState && party.playbackState.is_playing) {
             playSong(party.playbackState, true);
         }
     }
 
     const onPartyJoinedUnauthed = (partyStub: Party) => {
-        // setCurrentParty(party);
+        console.log('party stub: ', partyStub)
+        setCurrentParty(partyStub);
     }
 
     const onAdminChanged = (party: Party) => {
@@ -158,11 +156,11 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const handleUserLeaving = () => {
         socket.off(SocketEvent.USER_LEFT_PARTY_RES, onUserLeftParty);
         socket.off(SocketEvent.PARTY_PLAYBACK_CHANGED_RES, onPlaybackChanged);
-        socket.off(SocketEvent.PARTY_NOT_FOUND_RES, onPartyNotFound);
         socket.off(SocketEvent.PARTY_NEW_USER_JOINED_RES, onNewUserJoined);
         socket.off(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
         socket.off(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
         socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
+        socket.off(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
 
 
         console.log('Leaving party.')
@@ -214,8 +212,9 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             .catch(err => { console.log('could not get currently playing') })
     }
 
-
-
+    const onLeaveParty = () => {
+        history.push('/');
+    }
 
     // const onPartyJoinedUnauthed = (numberOfUsers: number) => {
     //     console.log('PARTY JOINED BACK')
@@ -225,7 +224,8 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     return (
         <div className="party-wrap">
             {user && !isLoading && user.id ?
-                <div>
+                (<div>
+                    <Button onClick={onLeaveParty} name="Leave Party"></Button>
                     <h2 className="mb-2">Welcome to the party {user.display_name} 🎉</h2>
                     {currentParty?.playbackState ?
                         <Player playback={currentParty.playbackState} />
@@ -236,10 +236,24 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
                         <h2>People in the party are</h2>
                         <div className="users">{currentParty?.users?.map(user => <UserAvatar key={user.id} isAdmin={user.id === currentParty.adminUser?.id} user={user} />)}</div>
                     </div>
-                </div>
+                </div>)
                 :
-                <div>This is a party, but you aint authed.</div>}
-        </div>);
+                (
+                    <div>
+                        < div > This is a party, but you aint authed.</div>
+                        {currentParty ?
+                            <div>
+                                <h4>Users in party</h4>
+                                <div className="users">{currentParty?.users?.map(user => <UserAvatar key={user.id} isAdmin={false} user={user} />)}</div>
+                            </div>
+                            :
+                            <div>no one here</div>
+                        }
+                        <a href={APP_API.LOGIN}>Login</a>
+                    </div>
+                )
+            }
+        </div >);
 
 };
 

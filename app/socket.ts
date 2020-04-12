@@ -47,6 +47,25 @@ export class Socket {
                 this.io.to(socket.id).emit(SocketEvent.PARTY_EXISTS_CHECK_RES, this.partyMap.has(partyId))
             });
 
+            socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, (partyId) => {
+                console.log('unauthed join to ', partyId);
+                if (this.partyMap.has(partyId)) {
+                    const party = this.partyMap.get(partyId)
+                    const partyStub: Pick<Party, "users"> = {
+                        users: party.users.map((user: User) => {
+                            return {
+                                display_name: user.display_name,
+                                images: user.images,
+                                id: null,
+                                product: null
+                            }
+                        })
+                    }
+                    console.log(partyStub)
+                    this.io.to(socket.id).emit(SocketEvent.PARTY_JOINED_UNAUTHED_RES, partyStub);
+                }
+            });
+
             // socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, (partyId) => {
             //     const currentParty = this.partyMap.has(partyId);
             // });
@@ -55,7 +74,7 @@ export class Socket {
                 console.log(`${user.id} trying to join ${partyId}`)
 
                 if (!this.partyMap.has(partyId)) {
-                    this.io.to(socketId).emit(SocketEvent.PARTY_NOT_FOUND_RES);
+                    // this.io.to(socketId).emit(SocketEvent.PARTY_NOT_FOUND_RES);
                     return;
                 }
 

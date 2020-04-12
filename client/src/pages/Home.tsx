@@ -18,8 +18,13 @@ const Home = (): React.ReactElement => {
         socket.on(SocketEvent.CREATE_PARTY_RES, (newPartyId: Party) => {
             history.push('/party/' + newPartyId)
         });
-        console.log(APP_API.ROOT);
+
+        return () => unregisterListeners();
     }, [])
+
+    const unregisterListeners = () => {
+        socket.off(SocketEvent.CREATE_PARTY_RES);
+    };
 
     const createRoom = (): void => {
         socket.emit(SocketEvent.CREATE_PARTY_REQ, socket.id);

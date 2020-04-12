@@ -4,7 +4,7 @@
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --watch '*' -e ts,tsx --exec npx tsc",
+    "watch": "nodemon --watch '*' -e ts,tsx --exec npx tsc",
     "build": "npx tsc"
   }
 }

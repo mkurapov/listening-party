@@ -28,7 +28,7 @@
     "build:client:dev": "cd client/ && yarn build:dev",
     "build:client:prod": "cd client/ && yarn build:prod",
     "build:common": "cd common/ && npx tsc",
-    "watch": "NODE_ENV=dev nodemon --watch 'server/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
+    "watch": "NODE_ENV=dev nodemon --watch 'app/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
     "heroku-build:client": "tsc & cd client/ && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod",
     "heroku-build:common": "cd common/ && npx tsc",
     "heroku-postbuild": "yarn build:common && yarn heroku-build:client"

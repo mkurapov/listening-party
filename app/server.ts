@@ -11,9 +11,11 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from './helpers'
 
-const BUILD_DIR = path.normalize(__dirname + "/..");
+const BUILD_DIR = process.env.NODE_ENV === 'production' ? path.normalize(__dirname + "/..") : path.normalize(__dirname + "/../build");
 const FE_PATH = path.join(BUILD_DIR, '/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
+
+console.log(FE_PATH)
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
 const SPOTIFY_TOKEN_URL = SPOTIFY_ACCOUNT_URL + '/api/token';
