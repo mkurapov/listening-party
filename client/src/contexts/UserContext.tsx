@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, createContext, useContext } from "react";
 
 import axios, { AxiosResponse } from 'axios';
-import { User } from '../common/models';
-import { SocketEvent } from '../common/events';
 
 import { getHashParams, getTimeWithMinutesOffset } from '../helpers/helpers';
 import { SPOTIFY_API, APP_API } from "../const";
 import socket from "../socket";
+import { User, SocketEvent } from "common";
 
 interface AuthHashParams {
     access_token: string;

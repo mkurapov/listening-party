@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Party } from '../common/models';
-import { SocketEvent } from '../common/events';
-
+import { SocketEvent, Party } from 'common'
 import Button from '../components/Button';
 import { useUser } from '../contexts/UserContext';
 import { APP_API } from '../const';

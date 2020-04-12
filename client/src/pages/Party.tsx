@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Party, PlaybackState } from '../common/models';
-import { SocketEvent } from '../common/events';
+import { SocketEvent, Party, PlaybackState, User } from 'common'
 import axios, { AxiosResponse } from 'axios';
 import { match, useHistory } from 'react-router';
 
 import { useUser } from '../contexts/UserContext';
 import socket from '../socket';
-import { User } from '../common/models';
 import { SPOTIFY_API } from '../const';
 import './Party.css'
 
