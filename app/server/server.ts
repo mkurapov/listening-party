@@ -26,7 +26,7 @@ interface SpotifyTokenResponse {
 
 export class Server {
     private app: Express;
-    private port: number;
+    private port: number | string;
 
     private stateKey = 'spotify_auth_state';
 
@@ -46,7 +46,7 @@ export class Server {
         });
     }
 
-    public start(port: number): http.Server {
+    public start(port: number | string): http.Server {
         this.port = port;
         return this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
     }

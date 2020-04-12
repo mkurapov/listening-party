@@ -3,7 +3,7 @@ import { Socket } from "./app/server/socket";
 import express from 'express';
 const app = express();
 
-const port = 8080;
+const port: string | number = process.env.port || 8080;
 
 const server = new Server(app);
 const httpServer = server.start(port);

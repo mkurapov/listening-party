@@ -11,17 +11,14 @@ export class Socket {
     private io: socketio.Server;
     private server: http.Server;
 
-    private port: number;
-
     private partyMap = new Map<string, Party>();
     private userMap = new Map<string, string>(); //socket id, user id
 
-    constructor(server: http.Server, port: number) {
+    constructor(server: http.Server, port: number | string) {
         this.server = server;
-        this.port = port;
         this.io = socketio.listen(this.server, { origins: '*:*' });
         this.io.on("connection", (socket: socketio.Socket) => {
-            console.log("Connected client on port:", this.port);
+            console.log("Connected client on port:", port);
             socket.on(SocketEvent.USER_LOGGEDIN_REQ, (userId) => {
                 this.userMap.set(socket.id, userId);
                 console.log('New user logged in ')

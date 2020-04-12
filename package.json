@@ -20,9 +20,10 @@
     "uuid": "^7.0.3"
   },
   "scripts": {
-    "start": "npx ts-node index.ts",
+    "start": "node ./build/index.js",
     "build": "npx tsc",
-    "watch": "nodemon --watch 'server/**/*' -e ts,tsx --exec 'ts-node' ./index.ts"
+    "dev": "nodemon --watch 'server/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
+    "heroku-postbuild": "tsc & cd react-app/ && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build"
   },
   "devDependencies": {
     "ts-node": "^8.8.2"
