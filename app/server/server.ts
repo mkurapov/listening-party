@@ -11,7 +11,7 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from '../helpers/helpers'
 
-const FE_PATH = '/client/';
+const FE_PATH = process.env.NODE_ENV ? path.resolve("./") + '/client/' : path.resolve("../") + '/client/';
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
@@ -33,7 +33,7 @@ export class Server {
     constructor(app: Express) {
         this.app = app;
 
-        this.app.use(express.static(path.resolve("./") + FE_PATH));
+        this.app.use(express.static(FE_PATH));
         this.app.use(cors())
         this.app.use(cookieParser())
 
@@ -42,7 +42,7 @@ export class Server {
         this.app.get('/refresh_token', this.refreshToken);
 
         this.app.get('*', (_: Request, res: Response): void => {
-            res.sendFile(path.resolve("./") + FE_PATH)
+            res.sendFile(FE_PATH)
         });
     }
 

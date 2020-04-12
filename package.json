@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "node ./build/index.js",
-    "start:prod": "node ./build/index.js",
+    "start:prod": "node NODE_ENV=production ./build/index.js",
     "build": "npx tsc",
     "dev": "nodemon --watch 'server/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
     "heroku-postbuild": "tsc & cd client/ && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod"
