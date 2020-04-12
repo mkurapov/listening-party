@@ -51,6 +51,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     let pollCurrentlyPlaying: any;
 
     const currentPartyRef = React.useRef(currentParty);
+    console.log(SocketEvent.TEST);
 
     // this is so that the socket io handler methods get the latest version of currentParty
     useEffect(() => {
@@ -92,7 +93,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             console.log('This party was not found... redirecting back');
             setTimeout(() => {
                 history.push('/');
-            }, POLL_TIME);
+            }, 2000);
         }
     }
 
@@ -148,7 +149,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             getCurrentlyPlaying(party.id);
             pollCurrentlyPlaying = setInterval(() => {
                 getCurrentlyPlaying(party.id);
-            }, 10000);
+            }, POLL_TIME);
         }
         setCurrentParty(party);
     }
