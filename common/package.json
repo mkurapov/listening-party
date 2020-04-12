@@ -2,5 +2,8 @@
   "name": "common",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --watch '*' -e ts,tsx --exec npx tsc"
+  }
 }

@@ -14,7 +14,6 @@ export interface Party {
     queue?: Song[];
     adminUser?: User;
     playbackState?: PlaybackState;
-    // getAdmin(): User;
 }
 
 export interface PlaybackState {

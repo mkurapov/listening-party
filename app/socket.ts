@@ -43,6 +43,14 @@ export class Socket {
                 this.io.to(socketId).emit(SocketEvent.CREATE_PARTY_RES, newParty.id);
             })
 
+            socket.on(SocketEvent.PARTY_EXISTS_CHECK_REQ, (partyId) => {
+                this.io.to(socket.id).emit(SocketEvent.PARTY_EXISTS_CHECK_RES, this.partyMap.has(partyId))
+            });
+
+            // socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, (partyId) => {
+            //     const currentParty = this.partyMap.
+            // });
+
             socket.on(SocketEvent.PARTY_JOINED_REQ, ({ user, socketId, partyId }: { user: User, socketId: string, partyId: string }) => {
                 console.log(`${user.id} trying to join ${partyId}`)
 

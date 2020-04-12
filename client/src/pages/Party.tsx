@@ -46,6 +46,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
     const partyId = match.params.id;
     const history = useHistory();
+    const POLL_TIME = 2000;
     let pollCurrentlyPlaying: any;
 
     const currentPartyRef = React.useRef(currentParty);
@@ -57,6 +58,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     useEffect(() => {
         // NEED TO CHECK IF PARTY EXISTS HERE 
+        socket.emit(SocketEvent.PARTY_EXISTS_CHECK_REQ);
         return () => handleUserLeaving();
     }, [])
 
@@ -67,12 +69,15 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         socket.on(SocketEvent.PARTY_NEW_USER_JOINED_RES, onNewUserJoined);
         socket.on(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
         socket.on(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
+        socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
     }
 
     useEffect(() => {
         if (!user || isLoading) {
             if (!isLoading) {
                 console.log('You are not authed');
+                localStorage.setItem('pendingParty', partyId);
+                socket.emit(SocketEvent.PARTY_JOINED_UNAUTHED_REQ);
             }
             return;
         }
@@ -118,7 +123,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         console.log('This party was not found... redirecting back');
         setTimeout(() => {
             history.push('/');
-        }, 2000);
+        }, POLL_TIME);
     }
 
     const onPartyJoined = (party: Party) => {
@@ -126,6 +131,10 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         if (party.playbackState && party.playbackState.is_playing) {
             playSong(party.playbackState, true);
         }
+    }
+
+    const onPartyJoinedUnauthed = (partyStub: Party) => {
+        // setCurrentParty(party);
     }
 
     const onAdminChanged = (party: Party) => {
@@ -149,6 +158,8 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         socket.off(SocketEvent.PARTY_NEW_USER_JOINED_RES, onNewUserJoined);
         socket.off(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
         socket.off(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
+        socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
+
 
         console.log('Leaving party.')
 
@@ -209,7 +220,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     return (
         <div className="party-wrap">
-            {user && user.id ?
+            {user && !isLoading && user.id ?
                 <div>
                     <h2 className="mb-2">Welcome to the party {user.display_name} 🎉</h2>
                     {currentParty?.playbackState ?
