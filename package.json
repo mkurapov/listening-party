@@ -24,6 +24,7 @@
     "start": "NODE_ENV=dev node ./build/index.js",
     "start:prod": "NODE_ENV=production node ./build/index.js",
     "build": "npx tsc",
+    "build:dev": "npx tsc && yarn build:client",
     "build:client": "cd client/ && yarn build:dev",
     "dev": "NODE_ENV=dev nodemon --watch 'server/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
     "heroku-postbuild": "tsc & cd client/ && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod"

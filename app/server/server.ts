@@ -21,7 +21,7 @@ const REDIRECT_URL = process.env.NODE_ENV === 'production' ?
     'https://listeningpartey.herokuapp.com/callback' :
     'http://localhost:8080/callback';
 
-
+console.log('FE_PATH:', FE_PATH);
 interface SpotifyTokenResponse {
     access_token: string;
     refresh_token: string;
