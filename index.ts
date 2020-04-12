@@ -1,5 +1,5 @@
-import { Server } from "./app/server/server";
-import { Socket } from "./app/server/socket";
+import { Server } from "./app/server";
+import { Socket } from "./app/socket";
 import express from 'express';
 const app = express();
 

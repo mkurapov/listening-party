@@ -9,11 +9,15 @@ import dotenv from 'dotenv';
 dotenv.config()
 
 import querystring from 'query-string';
-import { generateRandomString } from '../helpers/helpers'
+import { generateRandomString } from './helpers'
 
-const ROOT_DIR = path.normalize(__dirname + "/../..");
-const FE_PATH = path.join(ROOT_DIR, '/build/client');
+const BUILD_DIR = path.normalize(__dirname + "/..");
+const FE_PATH = path.join(BUILD_DIR, '/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
+
+console.log('BUILD_DIR ', BUILD_DIR)
+console.log('FE_PATH ', FE_PATH)
+console.log('__dirname ', __dirname)
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
 const SPOTIFY_TOKEN_URL = SPOTIFY_ACCOUNT_URL + '/api/token';
@@ -47,13 +51,6 @@ export class Server {
         this.app.get('*', (_: Request, res: Response): void => {
             res.sendFile(FE_PATH + '/index.html')
         });
-
-        // this.app.use((req, res, next) => {
-        //     if (req.method === 'GET' && req.accepts('html') && !req.is('json') &&
-        //         !req.path.includes('.')) {
-        //         res.sendFile(FE_PATH)
-        //     } else next();
-        // });
     }
 
     public start(port: number | string): http.Server {

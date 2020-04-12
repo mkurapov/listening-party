@@ -5,7 +5,7 @@ import { SocketEvent } from 'common'
 import dotenv from 'dotenv';
 dotenv.config()
 
-import { User, Party, PlaybackState } from '../../common/models';
+import { User, Party, PlaybackState } from 'common/models';
 
 export class Socket {
     private io: socketio.Server;
