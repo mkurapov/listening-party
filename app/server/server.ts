@@ -11,7 +11,7 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from '../helpers/helpers'
 
-const FE_PATH = process.env.NODE_ENV ? path.resolve("./") + '/client/' : path.resolve("../") + '/client/';
+const FE_PATH = process.env.NODE_ENV === 'production' ? path.resolve("../") + '/client/' : path.resolve("./") + '/client/';
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
