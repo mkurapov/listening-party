@@ -29,7 +29,7 @@
     "build:client:prod": "cd client/ && yarn build:prod",
     "build:common": "cd common/ && npx tsc",
     "watch": "NODE_ENV=dev nodemon --watch 'app/**/*' -e ts,tsx --exec 'ts-node' ./index.ts",
-    "heroku-build:client": "tsc & cd client/ && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod",
+    "heroku-build:client": "tsc & cd client/ && yarn link common && yarn install && yarn install --only=dev --no-shrinkwrap && yarn run build:prod",
     "heroku-build:common": "cd common/ && npx tsc",
     "heroku-postbuild": "yarn build:common && yarn heroku-build:client"
   },
