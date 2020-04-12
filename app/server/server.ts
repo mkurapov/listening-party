@@ -17,7 +17,9 @@ const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
 const SPOTIFY_TOKEN_URL = SPOTIFY_ACCOUNT_URL + '/api/token';
 
-const REDIRECT_URL = 'http://localhost:8080/callback';
+const REDIRECT_URL = process.env.NODE_ENV === 'production' ?
+    'https://listeningpartey.herokuapp.com/callback' :
+    'http://localhost:8080/callback';
 
 interface SpotifyTokenResponse {
     access_token: string;
