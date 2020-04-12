@@ -1,11 +1,9 @@
 import * as http from "http";
 import * as socketio from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { SocketEvent } from 'common'
+import { SocketEvent, User, Party, PlaybackState } from 'common'
 import dotenv from 'dotenv';
 dotenv.config()
-
-import { User, Party, PlaybackState } from 'common/models';
 
 export class Socket {
     private io: socketio.Server;
