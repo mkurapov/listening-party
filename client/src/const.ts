@@ -1,9 +1,8 @@
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 const SPOTIFY_URL = 'https://api.spotify.com/v1'
 
-const APP_URL = process.env.NODE_ENV === 'production' ?
-    'https://listeningpartey.herokuapp.com' :
-    'http://localhost:8080';
+const APP_URL = process.env.REACT_APP_APP_URL ? process.env.REACT_APP_APP_URL : 'https://listeningpartey.herokuapp.com/';
+console.log(process.env.REACT_APP_API_URL);
 
 export const APP_API = {
     ROOT: APP_URL,

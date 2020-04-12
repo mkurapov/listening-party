@@ -11,7 +11,7 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from '../helpers/helpers'
 
-const FE_PATH = path.join(__dirname, '../../client');
+const FE_PATH = path.join(__dirname, '../../build/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
@@ -21,14 +21,11 @@ const REDIRECT_URL = process.env.NODE_ENV === 'production' ?
     'https://listeningpartey.herokuapp.com/callback' :
     'http://localhost:8080/callback';
 
-console.log(REDIRECT_URL);
-
 
 interface SpotifyTokenResponse {
     access_token: string;
     refresh_token: string;
 }
-// console.log(path.resolve("../"));
 
 export class Server {
     private app: Express;
@@ -47,16 +44,16 @@ export class Server {
         this.app.get('/callback', this.callback);
         this.app.get('/refresh_token', this.refreshToken);
 
-        // this.app.get('*', (_: Request, res: Response): void => {
-        //     res.sendFile(FE_PATH)
-        // });
-
-        this.app.use((req, res, next) => {
-            if (req.method === 'GET' && req.accepts('html') && !req.is('json') &&
-                !req.path.includes('.')) {
-                res.sendFile('index.html', { FE_PATH });
-            } else next();
+        this.app.get('*', (_: Request, res: Response): void => {
+            res.sendFile(FE_PATH + '/index.html')
         });
+
+        // this.app.use((req, res, next) => {
+        //     if (req.method === 'GET' && req.accepts('html') && !req.is('json') &&
+        //         !req.path.includes('.')) {
+        //         res.sendFile(FE_PATH)
+        //     } else next();
+        // });
     }
 
     public start(port: number | string): http.Server {

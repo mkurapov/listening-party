@@ -8,7 +8,7 @@ import { UserProvider } from './contexts/UserContext';
 
 
 function App() {
-  console.log(process.env.NODE_ENV);
+  console.log(process.env.REACT_APP_API_URL)
   return (
     <UserProvider>
       <div className="App">
