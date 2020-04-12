@@ -70,6 +70,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         socket.on(SocketEvent.PARTY_JOINED_RES, onPartyJoined);
         socket.on(SocketEvent.PARTY_CHANGED_ADMIN_RES, onAdminChanged);
         socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
+        socket.on(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
     }
 
     useEffect(() => {
@@ -88,6 +89,9 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         socket.emit(SocketEvent.PARTY_JOINED_REQ, { user: user, socketId: socket.id, partyId: partyId })
     }, [user])
 
+    const onPartyExistsCheck = (hasParty: boolean) => {
+        console.log('Do we have party?', hasParty)
+    }
 
 
     const onUserLeftParty = (party: Party) => {

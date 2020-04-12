@@ -48,7 +48,7 @@ export class Socket {
             });
 
             // socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, (partyId) => {
-            //     const currentParty = this.partyMap.
+            //     const currentParty = this.partyMap.has(partyId);
             // });
 
             socket.on(SocketEvent.PARTY_JOINED_REQ, ({ user, socketId, partyId }: { user: User, socketId: string, partyId: string }) => {
