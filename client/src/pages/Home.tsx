@@ -18,6 +18,7 @@ const Home = (): React.ReactElement => {
         socket.on(SocketEvent.CREATE_PARTY_RES, (newPartyId: Party) => {
             history.push('/party/' + newPartyId)
         });
+        console.log(APP_API.ROOT);
     }, [])
 
     const createRoom = (): void => {
