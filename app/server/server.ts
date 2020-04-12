@@ -11,7 +11,8 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from '../helpers/helpers'
 
-const FE_PATH = path.join(__dirname, '../../build/client');
+const ROOT_DIR = path.normalize(__dirname + "/../..");
+const FE_PATH = path.join(ROOT_DIR, '/build/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + '/authorize';
@@ -21,7 +22,6 @@ const REDIRECT_URL = process.env.NODE_ENV === 'production' ?
     'https://listeningpartey.herokuapp.com/callback' :
     'http://localhost:8080/callback';
 
-console.log('FE_PATH:', FE_PATH);
 interface SpotifyTokenResponse {
     access_token: string;
     refresh_token: string;
