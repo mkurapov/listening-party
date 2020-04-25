@@ -25,6 +25,12 @@ const imageStyle = {
     height: '300px'
 }
 
+const Toast: React.FC<{ message: string }> = ({ message }): React.ReactElement => {
+    return <div className="toast">
+        {message}
+    </div>
+}
+
 const AdminUser: React.FC<{ adminUser: User | undefined }> = ({ adminUser }): React.ReactElement => {
     if (!adminUser) {
         return <div></div>;
@@ -72,18 +78,18 @@ const LeftSideBar: React.FC<{ party: Party, user: User }> = ({ party, user }): R
     }
 
     return (
-        <div className="side-bar">
-            <div className="block">
+        <div className="sidebar hidden-xs">
+            <div className="sidebar__block">
                 <Button classes="btn--fill btn--secondary" name="Leave Party" onClick={onLeaveClick}></Button>
             </div>
-            <div className="block">
+            <div className="sidebar__block">
                 <div className="text-left h2 mb-1 font-weight-normal">Users in party</div>
                 <AdminUser adminUser={party.adminUser} />
             </div>
-            <div className="users block" id="users">
+            <div className="users sidebar__block" id="users">
                 {party.users ? <UserList partyId={party.id} users={party.users.filter(u => u.id !== party.adminUser?.id)} isAdmin={party.adminUser?.id === user.id} /> : null}
             </div>
-            <div className="block">
+            <div className="sidebar__block">
                 <Button classes="btn--fill btn--primary" name="Copy invite link" onClick={onCopyLink}></Button>
             </div>
         </div>
