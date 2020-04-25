@@ -1,7 +1,7 @@
 import * as http from "http";
 import * as socketio from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { SocketEvent, User, Party, PlaybackState } from 'common'
+import { SocketEvent, User, Party, PlaybackState, Track } from 'common'
 import dotenv from 'dotenv';
 dotenv.config()
 
@@ -66,9 +66,14 @@ export class Socket {
                 }
             });
 
-            // socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, (partyId) => {
-            //     const currentParty = this.partyMap.has(partyId);
-            // });
+            socket.on(SocketEvent.PARTY_ADD_TO_QUEUE_REQ, ({ track, partyId }: { track: Track, partyId: string }) => {
+                console.log('adding to queue: ', { track, partyId });
+                const currentParty = this.partyMap.get(partyId);
+                if (currentParty) {
+                    currentParty.queue.push(track);
+                    this.io.to(partyId).emit(SocketEvent.PARTY_ADD_TO_QUEUE_RES, currentParty);
+                }
+            });
 
             socket.on(SocketEvent.PARTY_JOINED_REQ, ({ user, socketId, partyId }: { user: User, socketId: string, partyId: string }) => {
                 console.log(`${user.id} trying to join ${partyId}`)
@@ -100,6 +105,18 @@ export class Socket {
                     const updatedPartyState = { ...currentParty, playbackState };
                     this.partyMap.set(partyId, updatedPartyState);
                     this.io.to(partyId).emit(SocketEvent.PARTY_PLAYBACK_CHANGED_RES, updatedPartyState);
+                }
+            });
+
+            socket.on(SocketEvent.PARTY_CHANGED_ADMIN_REQ, ({ partyId, newAdminUser }: { partyId: string, newAdminUser: User }) => {
+                console.log('chaning admin user in ', partyId, 'to: ', newAdminUser)
+                const partyState = this.partyMap.get(partyId);
+                if (partyState) {
+                    // shouldnt happen, but just check
+                    if (partyState.adminUser.id !== newAdminUser.id) {
+                        partyState.adminUser = newAdminUser;
+                    }
+                    this.io.to(partyState.id).emit(SocketEvent.PARTY_CHANGED_ADMIN_RES, partyState);
                 }
             });
 

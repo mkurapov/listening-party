@@ -18,8 +18,11 @@ var SocketEvent;
     SocketEvent["PARTY_PLAYBACK_REQ"] = "PARTY_PLAYBACK_REQ";
     SocketEvent["PARTY_NEW_USER_JOINED_RES"] = "PARTY_NEW_USER_JOINED_RES";
     SocketEvent["PARTY_CHANGED_ADMIN_RES"] = "PARTY_CHANGED_ADMIN_RES";
+    SocketEvent["PARTY_CHANGED_ADMIN_REQ"] = "PARTY_CHANGED_ADMIN_REQ";
     SocketEvent["PARTY_EXISTS_CHECK_REQ"] = "PARTY_EXISTS_CHECK_REQ";
     SocketEvent["PARTY_EXISTS_CHECK_RES"] = "PARTY_EXISTS_CHECK_RES";
+    SocketEvent["PARTY_ADD_TO_QUEUE_REQ"] = "PARTY_ADD_TO_QUEUE_REQ";
+    SocketEvent["PARTY_ADD_TO_QUEUE_RES"] = "PARTY_ADD_TO_QUEUE_RES";
     SocketEvent["TEST"] = "TEST";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
 //# sourceMappingURL=events.js.map

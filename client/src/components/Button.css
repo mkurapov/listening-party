@@ -1,0 +1,22 @@
+.btn {
+    font-size: 20px;
+    padding: 16px 20px;
+    border: none;
+    font-family: HammersmithOne;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn--primary {
+    background-color: #5B0FA9;
+    color:white;
+}
+
+.btn--secondary {
+    color: #5B0FA9;
+    background-color: #F8EFFA;
+}
+
+.btn--fill {
+    width: 100%;
+}

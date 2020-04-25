@@ -1,14 +1,90 @@
 .user-wrap {
-    position: absolute;
     text-align: center;
     left:0;right:0;margin:0 auto;
     bottom:50px;
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    flex: 1;
+    margin-top: 0;
+    margin-bottom: auto;
+    flex-direction: column;
   }
 
 .users {
+    overflow-y: scroll;
     display:flex;
+    position: relative;
+    justify-self: flex-start;
+    flex-grow: 1;
+}
+
+/**  STYLE 4 */
+#users::-webkit-scrollbar-track {
+	background-color: white;
+}
+
+#users::-webkit-scrollbar-thumb {
+	background-color:white;
+	border: 2px solid #eeeeee;
+}
+
+#users::-webkit-scrollbar {
+	width: 5px;
+	background-color:white;
+}
+
+.player {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    height:calc(100% - 11vh);
+    max-width: 1000px;
+    padding-top: 11vh;
     align-items: center;
-    justify-content: center;
+    left:0;right:0;
+}
+
+.player__cover {
+    height: 40vh;
+    border-radius: 20px;
+    box-shadow: none;
+    transition: box-shadow 0.4s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.player__cover--playing {
+    transform: scale(1.04);
+    box-shadow: 0px 0px 30px 2px rgba(15,1,29,0.3)
+}
+
+.song__name, .song__artist {
+    font-weight: normal;
+}
+
+.song__name {
+    font-size: 60px;
+}
+
+.song__artist {
+    font-size: 40px;
+}
+
+.song__link {
+    position: absolute;
+    bottom: 40px;
+    color: #5B0FA9;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    padding: 10px 4px;
+}
+
+.user--admin {
+    background-color: #FFF18D;
+    border-radius: 12px;
 }
 
 .avatar {
@@ -27,7 +103,6 @@
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    margin-bottom: 0.5rem;
 }
 
 .avatar__placeholder {
@@ -51,6 +126,89 @@
 }
 
 .party-wrap {
-    max-width: 900px;
+    height:100vh;
+    background-color: #f8effa94;
     margin: 0 auto;
+}
+
+.side-bar {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    top: 0;
+    width: 14vw;
+    min-width: 300px;
+    background: white;
+    height:100vh;
+    align-items: stretch;
+    box-shadow: 0px 0px 30px 2px rgba(15,1,29,0.1);
+}
+
+.block {
+    width:calc(100% - 40px);
+    padding: 20px 20px;
+    border-bottom: 1px solid #EFE7F6;
+}
+
+.user__info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.user__info__name {
+    font-size: 32px;
+}
+
+.user__info__dj {
+    color: #E78942;
+    font-size: 20px;
+}
+
+.user__info__make_dj {
+    font-size: 20px;
+    text-decoration: underline;
+    color:inherit;
+    cursor: pointer;
+}
+
+:root {
+    --p1: 'M240.58,13.245s.423.565-16.322,0S195.826-2.681,180.116-3.263,159.21,17.895,144.788,20.627,127.233,4.162,114.275,3.551,98.875,31.144,83.924,27.62,67.029-3.627,46.289-3.263,30.445,13.486,12.011,13.245s.06.3-10.646,0';
+    --p2: 'M240.58,13.245s.423.565-16.322,0-26.564,7.963-42.275,7.382-24.187-10.114-38.61-7.382-15.236,7.992-28.194,7.382-16.638-3.858-31.589-7.382-15.146,3.909-35.886,4.273-17.261-4.032-35.7-4.273.06.3-10.646,0';
+    --p3: 'M240.58,13.245s.423.565-16.322,0S196.552,36.786,180.841,36.2,158.7.257,144.273,2.989s-14.3,25.822-27.258,25.211-15.9-26.982-30.85-30.506-14.256,38.147-35,38.511S30.445,13.486,12.011,13.245s.06.3-10.646,0';
+  }
+
+
+#wiggly {
+    animation-name: gogo;
+    animation-duration: 0.75s;
+    animation-delay: 0.3s;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
+    animation-fill-mode: both;
+    animation-timing-function: ease-in;
+}
+
+#wiggly.playing {
+    animation-play-state: running;
+}
+
+
+@keyframes gogo {
+    0% {
+        d: path(var(--p2));
+    }
+    25% {
+        d: path(var(--p3));
+    }
+    50% {
+        d: path(var(--p2));
+    }
+    75% {
+        d: path(var(--p1));
+    }
+    100% {
+        d: path(var(--p2));
+    }
 }

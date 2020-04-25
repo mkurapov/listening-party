@@ -1,22 +1,20 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React from 'react';
+import './Button.css';
 
 interface Props {
-    onClick?: () => void;
+    onClick: () => void;
     name: string;
+    classes?: string;
 }
 
-const styles = {
-    'font-size': '20px',
-    'padding': '10px 20px'
-}
 
 const Button: React.FC<Props> = ({
     name,
     onClick,
+    classes,
 }): React.ReactElement => {
-
     return (
-        <button style={styles} onClick={onClick}>{name}</button>
+        <button className={'btn ' + classes} onClick={onClick}>{name}</button>
     );
 };
 

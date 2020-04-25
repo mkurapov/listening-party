@@ -15,5 +15,7 @@ export const SPOTIFY_API = {
     CURRENTLY_PLAYING: SPOTIFY_URL + '/me/player/currently-playing',
     PLAYER: SPOTIFY_URL + '/me/player',
     PLAY: SPOTIFY_URL + '/me/player/play',
-    PAUSE: SPOTIFY_URL + '/me/player/pause'
+    PAUSE: SPOTIFY_URL + '/me/player/pause',
+    QUEUE: SPOTIFY_URL + '/me/player/queue',
+    SEARCH: SPOTIFY_URL + '/search'
 }

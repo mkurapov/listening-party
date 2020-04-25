@@ -15,27 +15,34 @@ export interface Party {
     playbackState?: PlaybackState;
 }
 
+export interface Album {
+    id: string;
+    album_type: string;
+    artists: Artist[]
+    images: [{
+        url: string;
+    }]
+}
+
+export interface Artist {
+    id: string;
+    name: string;
+    uri: string;
+}
+
+export interface Track {
+    id: string;
+    type: string;
+    uri: string;
+    name: string;
+    href: string;
+    album: Album;
+    artists: Artist[]
+}
+
 export interface PlaybackState {
     context: any;
-    item: {
-        id: string;
-        type: string;
-        uri: string;
-        name: string;
-        href: string;
-        album: {
-            id: string;
-            album_type: string;
-            artists: [{
-                id: string;
-                name: string;
-                uri: string;
-            }]
-            images: [{
-                url: string;
-            }]
-        }
-    };
+    item: Track;
     is_playing: boolean;
     progress_ms: number;
 }
