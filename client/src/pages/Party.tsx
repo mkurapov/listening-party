@@ -77,7 +77,7 @@ const LeftSideBar: React.FC<{ party: Party, user: User }> = ({ party, user }): R
                 <Button classes="btn--fill btn--secondary" name="Leave Party" onClick={onLeaveClick}></Button>
             </div>
             <div className="block">
-                <h1 className="text-left font-weight-normal">Users in party</h1>
+                <div className="text-left h2 mb-1 font-weight-normal">Users in party</div>
                 <AdminUser adminUser={party.adminUser} />
             </div>
             <div className="users block" id="users">
@@ -96,7 +96,7 @@ const UnauthedParty: React.FC<{ currentParty: Party | undefined }> = ({ currentP
             < div > This is a party, but you aint authed.</div>
             {currentParty ?
                 <div>
-                    <h4>Users in party</h4>
+                    <div>Users in party</div>
                     <div className="users">{currentParty?.users?.map(user =>
                         <div className="user">
                             <UserAvatar key={user.id} user={user} />
@@ -131,11 +131,11 @@ const Player: React.FC<{ playback: PlaybackState }> = ({ playback }): React.Reac
             <div className="player">
                 <div>
                     {/* <h3>{playback.is_playing ? 'Playing' : 'Paused'}</h3> */}
-                    <img className={`player__cover  mb-3 ${playback.is_playing ? 'player__cover--playing' : ''}`} src={playback?.item.album.images[0].url}></img>
-                    <div className="song__name mb-2">{playback.item.name}</div>
-                    <div className="song__artist mb-3">{playback.item.album.artists[0].name}</div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="248.416" height="50.639" viewBox="0 0 248.416 50.639">
-                        <path id="wiggly" className={playback.is_playing ? 'playing' : ''}  d="M240.58,13.245s.423.565-16.322,0-26.564,7.963-42.275,7.382-24.187-10.114-38.61-7.382-15.236,7.992-28.194,7.382-16.638-3.858-31.589-7.382-15.146,3.909-35.886,4.273-17.261-4.032-35.7-4.273.06.3-10.646,0" transform="translate(7.518 10)" fill="none" stroke="#5b0fa9" strokeLinecap="round" strokeWidth="5" />
+                    <img className={`player__cover  mb-2 ${playback.is_playing ? 'player__cover--playing' : ''}`} src={playback?.item.album.images[0].url}></img>
+                    <div className="song__name mb-1">{playback.item.name}</div>
+                    <div className="song__artist mb-2">{playback.item.album.artists[0].name}</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="250.416" height="50.639" viewBox="0 0 248.416 50.639">
+                        <path id="wiggly" className={playback.is_playing ? 'playing' : ''} d="M240.58,13.245s.423.565-16.322,0-26.564,7.963-42.275,7.382-24.187-10.114-38.61-7.382-15.236,7.992-28.194,7.382-16.638-3.858-31.589-7.382-15.146,3.909-35.886,4.273-17.261-4.032-35.7-4.273.06.3-10.646,0" transform="translate(5, 10)" fill="none" stroke="#5b0fa9" strokeLinecap="round" strokeWidth="5" />
                     </svg>
 
                 </div>
