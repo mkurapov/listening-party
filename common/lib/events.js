@@ -23,6 +23,7 @@ var SocketEvent;
     SocketEvent["PARTY_EXISTS_CHECK_RES"] = "PARTY_EXISTS_CHECK_RES";
     SocketEvent["PARTY_ADD_TO_QUEUE_REQ"] = "PARTY_ADD_TO_QUEUE_REQ";
     SocketEvent["PARTY_ADD_TO_QUEUE_RES"] = "PARTY_ADD_TO_QUEUE_RES";
+    SocketEvent["PARTY_POLL"] = "PARTY_POLL";
     SocketEvent["TEST"] = "TEST";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
 //# sourceMappingURL=events.js.map

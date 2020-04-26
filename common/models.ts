@@ -7,6 +7,12 @@ export interface User {
     }]
 }
 
+
+export interface PartyStub {
+    users: Pick<User, 'display_name' | 'images'>[];
+    playbackState: Pick<PlaybackState, 'item'>;
+}
+
 export interface Party {
     users?: User[];
     id: string;

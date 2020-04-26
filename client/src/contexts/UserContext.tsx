@@ -104,7 +104,7 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
     const updateUser = (user: User): void => {
         setUser(user);
         setIsLoading(false);
-        socket.emit(SocketEvent.USER_LOGGEDIN_REQ, user.id);
+        socket.emit(SocketEvent.USER_LOGGEDIN_REQ, user);
     }
 
     const logout = (): void => {

@@ -27,7 +27,7 @@ const Home = (): React.ReactElement => {
     };
 
     const createRoom = (): void => {
-        socket.emit(SocketEvent.CREATE_PARTY_REQ, socket.id);
+        socket.emit(SocketEvent.CREATE_PARTY_REQ, { socketId: socket.id });
     }
 
     return (<div>
