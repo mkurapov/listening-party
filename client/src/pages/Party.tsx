@@ -99,6 +99,8 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const { user, isLoading } = useUser();
     const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
     const [message, setMessage] = useState<string>('Loading...');
+    const [copyLinkBtnText, setCopyLinkBtnText] = useState('Copy invite link');
+
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
     const partyId = match.params.id;
@@ -258,12 +260,30 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         return axios.get(SPOTIFY_API.SEARCH, { params: { type: "track", q: query.replace(' ', '+') } })
     }
 
+    const onCopyLink = (): void => {
+        const dummy = document.createElement('input'),
+            text = window.location.href;
+
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        setCopyLinkBtnText('Copied! 🎉');
+        setTimeout(() => {
+            setCopyLinkBtnText('Copy invite link');
+        }, 3000);
+    }
+
 
     return (
         <div className="party-page">
             {user && !isLoading && currentParty ?
                 (<div>
-                    <a className="link link--leave-mobile visible-xs mt-1 text-center" onClick={() => history.push('/')}>Leave party</a>
+                    <div className="nav__mobile">
+                        <a className="link link--leave-mobile text-center" onClick={() => history.push('/')}>Leave party</a>
+                        <Button classes="btn--sm btn--primary" name={copyLinkBtnText} onClick={onCopyLink}></Button>
+                    </div>
                     <div className="party-contents">
                         {currentParty.playbackState && !errorMessageRef.current ?
                             <Player playback={currentParty.playbackState} />

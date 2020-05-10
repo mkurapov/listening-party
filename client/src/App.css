@@ -117,6 +117,7 @@ a:hover {
 a.btn {
   text-decoration: none;
   display: inline-block;
+  cursor: pointer;
 }
 
 a.btn:hover {
@@ -130,6 +131,7 @@ a.btn--primary:hover {
 a.btn--secondary:hover {
   color: var(--col-primary);
 }
+
 
 .btn {
   font-family: 'Hammersmith One', sans-serif;
@@ -158,6 +160,12 @@ a.btn--secondary:hover {
 .btn--fill {
   width: 100%;
 }
+
+.btn--sm {
+  font-size: 14px;
+  padding: 10px 14px;
+}
+
 
 @media (max-width:768px) {
   .text--lg {

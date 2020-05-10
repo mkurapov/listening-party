@@ -71,12 +71,21 @@
     margin: 0 auto;
 }
 
-.link--leave-mobile {
+.nav__mobile {
+    display: none;
+    align-items: center;
     position: absolute;
-    top:2rem;
-    cursor: pointer;
+    padding: 2rem 2rem;
+    justify-content: space-between;
     margin:0 auto;left:0;right:0;
 }
+
+
+.link--leave-mobile {
+    cursor: pointer;
+}
+    
+   
 
 
 
@@ -84,6 +93,10 @@
 @media (max-width: 768px) {
     .party-page {
         overflow: hidden;
+    }
+
+    .nav__mobile {
+        display: flex;
     }
 
     .party-contents {

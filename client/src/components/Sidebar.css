@@ -82,7 +82,7 @@
         top:auto;
         height:80px;
         margin:0 auto;
-        width:calc(100% - 20px);
+        width:calc(100% - 2rem);
         box-shadow: none;
         margin: 0 auto;left:0;right:0;
         background-color: white;
