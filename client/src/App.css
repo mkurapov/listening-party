@@ -10,7 +10,16 @@ body {
   font-family: 'Hammersmith One', sans-serif;
   font-weight: lighter !important;
   -webkit-font-smoothing: antialiased;
+  /* text-align: center; */
+  background-color:var(--col-secondary);
+}
+
+.text-center {
   text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
 }
 
 a {
@@ -60,6 +69,10 @@ a:hover {
   margin-right: 2rem;
 }
 
+.mr-3 {
+  margin-right: 3rem;
+}
+
 .mt-1 {
   margin-top:1rem;
 }
@@ -67,6 +80,17 @@ a:hover {
   margin-top:2rem;
 }
 
+.text--lg {
+  font-size: 30px;
+}
+
+.text--xl {
+  font-size: 60px;
+}
+
+.text--xxl {
+  font-size: 70px;
+}
 
 .h2 {
   font-size: 24px;
@@ -79,4 +103,65 @@ a:hover {
 
 .font-weight-normal {
   font-weight: normal;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+a.btn:hover {
+  transform: scale(1.1);
+}
+
+a.btn--primary:hover {
+  color:white;
+}
+
+a.btn--secondary:hover {
+  color: var(--col-primary);
+}
+
+.btn {
+  font-size: 16px;
+  padding: 14px 20px;
+  border: none;
+  font-family: HammersmithOne;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: scale(1.1);
+}
+
+.btn--primary {
+  background-color: var(--col-primary);
+  color:white;
+}
+
+.btn--secondary {
+  color: #5B0FA9;
+  background-color: #F8EFFA;
+}
+
+.btn--fill {
+  width: 100%;
+}
+
+@media (max-width:768px) {
+  .text--lg {
+    font-size: 24px;
+  }
+  
+  .text--xl {
+    font-size: 30px;
+  }
+  
+  .text--xxl {
+    font-size: 80px;
+  }
 }

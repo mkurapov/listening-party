@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, createContext, useContext } from "react";
+import React, { useState, useEffect, useCallback, useMemo, createContext, useContext, useRef } from "react";
 
 import axios, { AxiosResponse } from 'axios';
 
@@ -17,7 +17,6 @@ interface AuthHashParams {
 interface RefreshAccessTokenResponse {
     access_token: string;
 }
-
 
 export interface UserContext {
     user: User | undefined;
@@ -38,6 +37,26 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
     let storedUser: string | null;
     let storedAccessToken: string | null;
     let storedRefreshToken: string | null;
+
+    const refreshTokenCheckInterval = useRef<any>(null)
+    const REFRESH_TOKEN_POLL_TIME = 30 * 6000;
+
+    const startRefreshTokenPoll = () => {
+        if (refreshTokenCheckInterval.current !== null) {
+            return;
+        }
+        refreshTokenCheckInterval.current = setInterval(() => {
+            refreshAccessToken();
+        }, REFRESH_TOKEN_POLL_TIME);
+    }
+
+    const stopRefreshTokenPoll = () => {
+        if (refreshTokenCheckInterval.current === null) {
+            return;
+        }
+        clearInterval(refreshTokenCheckInterval.current);
+        refreshTokenCheckInterval.current = null;
+    }
 
     useEffect(() => {
         console.log('Checking login...');
@@ -65,19 +84,31 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
 
         const expiryDate = localStorage.getItem('expiry_time');
         if (expiryDate && new Date().getTime() > parseInt(expiryDate)) {
-            console.log('expired');
-            getNewAccessToken(storedRefreshToken).then(res => {
-                updateUser(parsedUser);
-                setAuthheader(res.data.access_token);
-                localStorage.setItem('access_token', res.data.access_token);
-                localStorage.setItem('expiry_time', getTimeWithMinutesOffset(59).getTime().toString())
-            });
+            console.log('expired refresh token');
+            refreshAccessToken();
         } else {
             setAuthheader(storedAccessToken);
-            updateUser(parsedUser);
         }
+
+        startRefreshTokenPoll();
+        updateUser(parsedUser);
         checkIfPendingParty();
+
+        return () => stopRefreshTokenPoll();
     }, [])
+
+    const refreshAccessToken = () => {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+            return;
+        }
+        console.log('GETTING NEW ACCESS TOKEN');
+        getNewAccessToken(refreshToken).then(res => {
+            setAuthheader(res.data.access_token);
+            localStorage.setItem('access_token', res.data.access_token);
+            localStorage.setItem('expiry_time', getTimeWithMinutesOffset(59).getTime().toString())
+        });
+    }
 
     const checkIfPendingParty = () => {
         const pendingPartyId = localStorage.getItem('pending_party');
@@ -96,7 +127,7 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
             localStorage.setItem('user', JSON.stringify(res.data));
             localStorage.setItem('access_token', locationArgs.access_token);
             localStorage.setItem('refresh_token', locationArgs.refresh_token);
-            localStorage.setItem('expiry_time', getTimeWithMinutesOffset(1).getTime().toString())
+            localStorage.setItem('expiry_time', getTimeWithMinutesOffset(59).getTime().toString())
             checkIfPendingParty();
         });
     }
