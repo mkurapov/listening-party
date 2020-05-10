@@ -59,6 +59,10 @@
     margin-left: max(280px, 10vw);
 }
 
+.party-message {
+    width:600px;
+}
+
 
 .song {
     max-width: 400px;
@@ -73,6 +77,9 @@
     cursor: pointer;
     margin:0 auto;left:0;right:0;
 }
+
+
+
 
 @media (max-width: 768px) {
     .party-page {

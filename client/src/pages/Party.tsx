@@ -99,12 +99,16 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const { user, isLoading } = useUser();
     const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
     const [message, setMessage] = useState<string>('Loading...');
+    // const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
     const partyId = match.params.id;
     const history = useHistory();
 
-    const currentPartyRef = useRef(currentParty)
-    const intervalRef = useRef<any>(null)
+    const currentPartyRef = useRef(currentParty);
+    const errorMessageRef = useRef<string | null>(null);
+
+    const intervalRef = useRef<any>(null);
+
     const DJ_POLL_TIME = 1000;
 
     // this is so that the socket io handler methods get the latest version of currentParty
@@ -142,9 +146,9 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     const onPartyPoll = (party: Party) => {
         if (party.adminUser?.id === user?.id) {
-            startPolling(party.id);
+            startPollingCurrentlyPlaying(party.id);
         } else if (party.playbackState) {
-            stopPolling();
+            stopPollingCurrentlyPlaying();
             const isNowPlaying = party.playbackState.is_playing && !currentPartyRef.current?.playbackState?.is_playing;
             const isNowPaused = !party.playbackState.is_playing && currentPartyRef.current?.playbackState?.is_playing;
             const isNewSong = currentPartyRef.current?.playbackState?.item.id !== party.playbackState.item.id;
@@ -168,12 +172,21 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
         socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
         socket.off(SocketEvent.PARTY_POLL, onPartyPoll);
-        stopPolling();
+        stopPollingCurrentlyPlaying();
 
         console.log('Leaving party.');
     }
 
-    const startPolling = (partyId: string) => {
+    const stopPollingCurrentlyPlaying = () => {
+        if (intervalRef.current === null) {
+            return;
+        }
+        console.log("STOPPED DJ  POLL")
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+    }
+
+    const startPollingCurrentlyPlaying = (partyId: string) => {
         if (intervalRef.current !== null) {
             return;
         }
@@ -183,14 +196,6 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         }, DJ_POLL_TIME);
     }
 
-    const stopPolling = () => {
-        if (intervalRef.current === null) {
-            return;
-        }
-        console.log("STOPPED DJ  POLL")
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-    }
 
     const playSong = (playbackState: PlaybackState, isFirstTime = false) => {
         console.log('setting currently playing...');
@@ -200,17 +205,26 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             position_ms: isFirstTime ? playbackState.progress_ms : 0
         }
         axios.put(SPOTIFY_API.PLAY, args)
-            .then(() => console.log('Playing new song: ', playbackState.item.name))
+            .then(() => {
+                console.log('Playing new song: ', playbackState.item.name);
+                if (errorMessageRef.current) {
+                    errorMessageRef.current = null;
+                }
+            })
             .catch(err => {
                 const error = err.response.data.error;
                 if (error.reason === "NO_ACTIVE_DEVICE") {
-                    console.log('Could not play song. No active device found.')
+                    console.log('Could not play song. No active device found.');
+                    errorMessageRef.current = `No active Spotify device found. Please open Spotify, and hit play to start listening.`;
+                    setTimeout(() => { playSong(playbackState); }, 1000);
                 } else if (error.reason === "PREMIUM_REQUIRED") {
                     console.log('Could not play song. Premium required.')
                 } else {
                     console.log('Could not play song. Error: ', error);
                 }
             });
+
+
     }
 
     const pauseSong = () => {
@@ -228,8 +242,12 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             .then((res: AxiosResponse<PlaybackState>) => {
                 if (!res.data || !res.data.item) {
                     console.log('Nothing is playing, its an ad, or you are in private mode.');
-                    setMessage(isAdminUser ? 'Nothing is playing, or you are listening in private mode.' : 'Nothing is playing. Ask your DJ to play some music.');
+                    errorMessageRef.current = isAdminUser ? 'Nothing is playing on your Spotify device, or you are listening in private mode.' : 'Nothing is playing. Ask your DJ to play some music.';
                     return;
+                }
+
+                if (errorMessageRef.current) {
+                    errorMessageRef.current = null
                 }
                 socket.emit(SocketEvent.PARTY_PLAYBACK_REQ, { playbackState: res.data, partyId: partyId })
             })
@@ -246,11 +264,10 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
             {user && !isLoading && currentParty ?
                 (<div>
                     <a className="link link--leave-mobile visible-xs mt-1 text-center" onClick={() => history.push('/')}>Leave party</a>
-                    {/* <h2 className="mb-2">Welcome to the party {user.display_name} 🎉</h2> */}
                     <div className="party-contents">
-                        {currentParty.playbackState ?
+                        {currentParty.playbackState && !errorMessageRef.current ?
                             <Player playback={currentParty.playbackState} />
-                            : <div className="text--lg">{message}</div>
+                            : <div className="text--lg party-message">{errorMessageRef.current}</div>
                         }
                     </div>
 

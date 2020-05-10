@@ -28,7 +28,7 @@ const Player: React.FC<{ playback: PlaybackState }> = ({ playback }): React.Reac
 
                         </svg>
                     </div>
-                    <div className="song__name mb-1">{playback.item.name}</div>
+                    <div className="song__name">{playback.item.name}</div>
                     <div className="song__artist mb-3">{playback.item.album.artists[0].name}</div>
                 </div>
 

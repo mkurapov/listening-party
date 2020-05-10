@@ -4,6 +4,10 @@
   --col-secondarier: #FAF7FB;
 }
 
+@font-face {
+  font-family: 'Hammersmith One';
+  src: local('HammersmithOne-Regular'), url(./fonts/HammersmithOne-Regular.ttf) 
+}
 
 body {
   color: var(--col-primary);
@@ -111,6 +115,7 @@ a:hover {
 
 a.btn {
   text-decoration: none;
+  display: inline-block;
 }
 
 a.btn:hover {
@@ -162,6 +167,6 @@ a.btn--secondary:hover {
   }
   
   .text--xxl {
-    font-size: 80px;
+    font-size: 50px;
   }
 }

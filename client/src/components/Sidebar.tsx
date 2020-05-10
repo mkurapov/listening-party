@@ -29,8 +29,8 @@ const UserList: React.FC<{ users: User[], partyId: string, isAdmin: boolean }> =
     }
 
     return (
-        <div>{users.map(user =>
-            <div className="user">
+        <div>{users.map((user, i) =>
+            <div key={i} className="user">
                 <UserAvatar user={user} />
                 <span className="user__info">
                     <span className="user__info__name">{user.display_name}</span>
@@ -42,8 +42,8 @@ const UserList: React.FC<{ users: User[], partyId: string, isAdmin: boolean }> =
 
 const MobileUserList: React.FC<{ users: User[], partyId: string, isAdmin: boolean }> = ({ users, partyId, isAdmin }): React.ReactElement => {
     return (
-        <div className="users--mobile">{users.map(user =>
-            <div className="user">
+        <div className="users--mobile">{users.map((user, i) =>
+            <div key={i} className="user">
                 <UserAvatar user={user} />
             </div>
         )}</div>);
