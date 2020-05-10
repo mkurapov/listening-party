@@ -28,6 +28,7 @@ h1, h2, h3, h4, h5, h6 {
 
 a {
   color: inherit;
+  font-family: 'Hammersmith One', sans-serif;
 }
 
 a:hover {
@@ -131,6 +132,7 @@ a.btn--secondary:hover {
 }
 
 .btn {
+  font-family: 'Hammersmith One', sans-serif;
   font-size: 16px;
   padding: 14px 20px;
   border: none;
