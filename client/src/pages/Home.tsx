@@ -91,7 +91,7 @@ const HomePageAuthed: React.FC<{ user: User }> = ({ user }): React.ReactElement 
                     <Button classes="btn--primary d-block mb-4" name="Start a party 🎉" onClick={createRoom}></Button>
                 </div>
                 <div className="home__logout">
-                    <a href={APP_API.LOGIN} onClick={logout} className="link">or logout</a>
+                    <a onClick={logout} className="link">or logout</a>
                 </div>
             </div>
         </>
