@@ -1,8 +1,10 @@
 import * as http from "http";
 import * as socketio from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { SocketEvent, User, Party, PlaybackState, Track, PartyStub } from 'common'
+import { SocketEvent, User, Party, PlaybackState, PartyStub } from 'common'
 import dotenv from 'dotenv';
+import { StateModel } from './database';
+
 dotenv.config()
 
 export class Socket {
@@ -16,6 +18,11 @@ export class Socket {
 
     constructor(server: http.Server, port: number | string) {
         this.server = server;
+
+        setInterval(() => {
+            this.saveState();
+        }, 10000);
+
         this.io = socketio.listen(this.server, { origins: '*:*' });
         this.io.on("connection", (socket: socketio.Socket) => {
             console.log("Connected client on port:", port);
@@ -140,5 +147,15 @@ export class Socket {
                 this.userMap.delete(socket.id);
             }
         });
+    }
+
+    public saveState(): void {
+        const currentState = {
+            numUsers: this.userMap.size,
+            numParties: this.partyMap.size
+        };
+
+        const state = new StateModel(currentState)
+        state.save();
     }
 }

@@ -6,13 +6,14 @@ import cors from 'cors';
 import axios, { AxiosResponse } from 'axios';
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv';
+import * as database from './database';
 dotenv.config()
+
 
 import querystring from 'query-string';
 import { generateRandomString } from './helpers'
-import { SocketEvent } from "common";
 
-const BUILD_DIR = process.env.NODE_ENV === 'production' ? path.normalize(__dirname + "/..") : path.normalize(__dirname + "/../build");
+const BUILD_DIR = process.env.NODE_ENV === 'production' ? path.normalize(__dirname + "/..") : path.normalize(__dirname + "/..");
 const FE_PATH = path.join(BUILD_DIR, '/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
 
@@ -44,6 +45,7 @@ export class Server {
         this.app.get("/login", this.login);
         this.app.get('/callback', this.callback);
         this.app.get('/refresh_token', this.refreshToken);
+        this.app.get('/info', this.getInfo)
 
         this.app.get('*', (_: Request, res: Response): void => {
             res.sendFile(FE_PATH + '/index.html')
@@ -52,7 +54,14 @@ export class Server {
 
     public start(port: number | string): http.Server {
         this.port = port;
+        this.setUpDb();
+
         return this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
+    }
+
+    private setUpDb = async () => {
+        await database.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true });
+        console.log('DB connected');
     }
 
     public login = (_: Request, res: Response): void => {
@@ -132,7 +141,11 @@ export class Server {
             });
         }).catch(error => {
             console.log(error.response);
-            console.log(error.response);
         });
     };
+
+    public getInfo = async (_: Request, res: Response): Promise<void> => {
+        const currentState = await database.StateModel.findOne().sort({ 'createdAt': -1 });
+        res.send(currentState);
+    }
 }
