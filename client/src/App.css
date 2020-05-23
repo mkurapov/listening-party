@@ -36,6 +36,7 @@ a:hover {
 
 .link {
   display: inline-block;
+  cursor: pointer;
   text-decoration: underline;
   text-decoration-style: dashed;
 }
