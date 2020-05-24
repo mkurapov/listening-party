@@ -2,12 +2,18 @@
 <html lang="en">
 
 <head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-75784561-9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-75784561-9');
+  </script>
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#5B0FA9" />
-  <meta name="description" content="Listen to Spotify in-sync with your friends" />
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -23,7 +29,27 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <link href="%PUBLIC_URL%/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <title>Listening Party</title>
+  <title>Spotify Music Party</title>
+  <meta itemprop="name" content="Spotify Music Party">
+
+  <meta itemprop="description" content='Listen to Spotify in-sync with your friends'>
+  <meta itemprop="image" content="https://spotifymusic.party/thumbnail.png">
+
+  <meta property="og:url" content="https://spotifymusic.party">
+  <meta property="og:description" content='Listen to Spotify in-sync with your friends'>
+  <meta property="og:site_name" content="Spotify Music Party">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://spotifymusic.party/thumbnail.png">
+  <meta property="og:url" content="https://spotifymusic.party">
+
+  <meta name="twitter:description" content='Listen to Spotify in-sync with your friends'>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Spotify Music Party">
+  <meta name="twitter:image" content="https://spotifymusic.party/thumbnail.png">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16x16.png">
 </head>
 
 <body>

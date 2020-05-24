@@ -87,11 +87,11 @@ const HomePageAuthed: React.FC<{ user: User }> = ({ user }): React.ReactElement 
             <div className="page page--full">
                 <div className="text-center">
                     <div className="text--xxl">Hi, {user.display_name}!</div>
-                    <div className="home__subtext mb-3 text--lg">Welcome to Listening Party.</div>
+                    <div className="home__subtext mb-3 text--lg">Welcome to Spotify Music Party.</div>
                     <Button classes="btn--primary d-block mb-4" name="Start a party 🎉" onClick={createRoom}></Button>
                 </div>
                 <div className="home__logout">
-                    <a onClick={logout}  className="link">or logout</a>
+                    <a onClick={logout} className="link">or logout</a>
                 </div>
             </div>
         </>
