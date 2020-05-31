@@ -13,6 +13,7 @@ dotenv.config()
 import querystring from 'query-string';
 import { generateRandomString } from './helpers'
 
+const DB_NAME = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
 const BUILD_DIR = process.env.NODE_ENV === 'production' ? path.normalize(__dirname + "/..") : path.normalize(__dirname + "/..");
 const FE_PATH = path.join(BUILD_DIR, '/client');
 const SPOTIFY_ACCOUNT_URL = 'https://accounts.spotify.com';
@@ -60,7 +61,7 @@ export class Server {
     }
 
     private setUpDb = async () => {
-        await database.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true });
+        await database.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true, dbName: DB_NAME });
         console.log('DB connected');
     }
 
