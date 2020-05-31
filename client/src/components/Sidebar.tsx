@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Party, User, SocketEvent } from 'common'
 import { useHistory } from 'react-router';
 import Button from './Button';

@@ -1,9 +1,0 @@
-.toast {
-    width: 600px;
-    position: absolute;
-    top:30px;
-    margin:0 auto;left:0;right:0;
-    background-color: var(--col-primary);
-    color:white;
-    font-size: 30px;
-}

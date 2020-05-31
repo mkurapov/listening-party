@@ -24,13 +24,6 @@ interface SearchResults {
     }
 }
 
-const Toast: React.FC<{ message: string }> = ({ message }): React.ReactElement => {
-    return <div className="toast">
-        {message}
-    </div>
-}
-
-
 const UnauthedParty: React.FC<{ partyStub: PartyStub }> = ({ partyStub }): React.ReactElement => {
     const USERS_TO_SHOW = 5;
     console.log(partyStub)
@@ -98,10 +91,8 @@ const OtherUsersAvatar: React.FC<{ count: number }> = ({ count }): React.ReactEl
 const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     const { user, isLoading } = useUser();
     const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
-    const [message, setMessage] = useState<string>('Loading...');
     const [copyLinkBtnText, setCopyLinkBtnText] = useState('Copy invite link');
 
-    // const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
     const partyId = match.params.id;
     const history = useHistory();
@@ -119,7 +110,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
     }, [currentParty])
 
     useEffect(() => {
-        // socket.on(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
+        socket.on(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
         socket.emit(SocketEvent.PARTY_EXISTS_CHECK_REQ, partyId);
 
         socket.on(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
@@ -147,6 +138,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
 
     const onPartyPoll = (party: Party) => {
+        console.log('polling party: ', party);
         if (party.adminUser?.id === user?.id) {
             startPollingCurrentlyPlaying(party.id);
         } else if (party.playbackState) {
@@ -164,6 +156,17 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         setCurrentParty(party);
     }
 
+    const onPartyExistsCheck = (hasParty: boolean) => {
+        console.log('party check: ', hasParty);
+        if (!hasParty) {
+            errorMessageRef.current = 'Party does not exist, returning to home screen...';
+            console.log('error: ', errorMessageRef.current);
+            setTimeout(() => {
+                history.push('/');
+            }, 3000)
+        }
+    }
+
     const onPartyJoinedUnauthed = (partyStub: PartyStub) => {
         console.log('party stub: ', partyStub)
         setCurrentPartyStub(partyStub);
@@ -174,6 +177,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
         socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
         socket.off(SocketEvent.PARTY_POLL, onPartyPoll);
+        socket.off(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
         stopPollingCurrentlyPlaying();
 
         console.log('Leaving party.');
@@ -225,8 +229,6 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
                     console.log('Could not play song. Error: ', error);
                 }
             });
-
-
     }
 
     const pauseSong = () => {
@@ -278,6 +280,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     return (
         <div className="party-page">
+            {errorMessageRef.current}
             {user && !isLoading && currentParty ?
                 (<div>
                     <div className="nav__mobile">
@@ -285,7 +288,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
                         <Button classes="btn--sm btn--primary" name={copyLinkBtnText} onClick={onCopyLink}></Button>
                     </div>
                     <div className="party-contents">
-                        {currentParty.playbackState && !errorMessageRef.current ?
+                        {currentParty.playbackState ?
                             <Player playback={currentParty.playbackState} />
                             : <div className="text--lg party-message">{errorMessageRef.current}</div>
                         }
@@ -296,7 +299,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
                 :
                 <div className="party--unauthed">
                     <Wiggle />
-                    {partyStub ? <UnauthedParty partyStub={partyStub} /> : <div>Loading...</div>}
+                    {partyStub ? <UnauthedParty partyStub={partyStub} /> : <div>{errorMessageRef.current}</div>}
                     <div className="party--unauthed__footer">
                         <div className="mb-3">
                             <Wiggle />

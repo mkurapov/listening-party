@@ -150,6 +150,9 @@ export class Socket {
     }
 
     public saveState(): void {
+        this.partyMap.forEach((value, key) => {
+            console.log(`m[${key}] = ${value}`);
+        })
         const currentState = {
             numUsers: this.userMap.size,
             numParties: this.partyMap.size

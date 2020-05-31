@@ -25,7 +25,7 @@ const FAQ: React.FC = (): React.ReactElement => {
                     <div className="font-weight-bold text--lg">Does this work for podcasts?</div>
                     <div className="mb-4 text--lg">No, sorry, no podcast parties for now.</div>
                     <div className="font-weight-bold text--lg">Do I have to have the tab open in order for this to work?</div>
-                    <div className="mb-4 text--lg">Yes, in order to have the music synced, the tab to the link should be open. A Chrome extension is possible in the future.  😎 </div>
+                    <div className="mb-4 text--lg">Yes, in order to have the music synced, the tab to the link should be open. A Chrome extension is possible in the future.  <span role="img">😎</span> </div>
                     <div className="font-weight-bold text--lg">Can I request feaures/make a comment?</div>
                     <div className="text--lg">Of course! It would be also much appreciated. You can do this <a className="link" href="https://forms.gle/LYAqcmCUKxigzUhg7">here</a>.</div>
                 </div>
@@ -54,7 +54,7 @@ const HomePageUnauthed = (): React.ReactElement => {
     return (
         <div className="page page--full">
             <div>
-                <h1 className="text--xl font-weight-bold mb-3">Spotify Listening Party 🎉</h1>
+                <h1 className="text--xl font-weight-bold mb-3">Spotify Music Party <span role="img">🎉</span></h1>
                 <h2 className="text--lg mb-4">Listen to music in-sync with your friends</h2>
                 <a href={APP_API.LOGIN} className="btn btn--primary">Login with Spotify</a>
             </div>

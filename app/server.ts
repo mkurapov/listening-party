@@ -145,7 +145,7 @@ export class Server {
     };
 
     public getInfo = async (_: Request, res: Response): Promise<void> => {
-        const currentState = database.StateModel.findOne().sort({ 'createdAt': -1 });
+        const currentState = await database.StateModel.findOne().sort({ 'createdAt': -1 });
         res.send(currentState);
     }
 }
