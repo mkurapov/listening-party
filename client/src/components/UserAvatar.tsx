@@ -1,5 +1,5 @@
 import React from 'react';
-import {  User } from 'common'
+import { User } from '../types';
 import './UserAvatar.css';
 
 const UserAvatar: React.FC<{ user: Pick<User, 'display_name' | 'images'> }> = ({ user }): React.ReactElement => {

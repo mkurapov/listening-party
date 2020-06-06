@@ -1,105 +1,124 @@
 .party-page {
-    /* height:100vh; */
-    background-color:var(--col-secondary);
-    /* margin-left:10vw; */
-    text-align: center;
+  /* height:100vh; */
+  background-color: var(--col-secondary);
+  /* margin-left:10vw; */
+  text-align: center;
 }
 
 .user-wrap {
-    text-align: center;
-    left:0;right:0;margin:0 auto;
-    bottom:50px;
-    display: flex;
-    align-items: stretch;
-    height: 100%;
-    flex: 1;
-    margin-top: 0;
-    margin-bottom: auto;
-    flex-direction: column;
-  }
+  text-align: center;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  bottom: 50px;
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  flex: 1;
+  margin-top: 0;
+  margin-bottom: auto;
+  flex-direction: column;
+}
 
 .users {
-    overflow-y: scroll;
-    display:flex;
-    position: relative;
-    justify-self: flex-start;
-    flex-grow: 1;
+  overflow-y: scroll;
+  display: flex;
+  position: relative;
+  justify-self: flex-start;
+  flex-grow: 1;
 }
 
 .users--unauthed {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .user__info--unauthed {
-    font-size: 24px;
+  font-size: 24px;
 }
 
 .party--unauthed {
-    height: 100vh;
-    padding: 5vh 20px 6vh 20px;
-    margin: 0 auto;
-    max-width: 900px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+  height: 100vh;
+  padding: 5vh 20px 6vh 20px;
+  margin: 0 auto;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.party--unauthed__footer  {
-    display: flex;
-    flex-direction: column;
+.party--unauthed__footer {
+  display: flex;
+  flex-direction: column;
 }
 
 .party-contents {
-    display: flex;
-    height:100vh;
-    align-items: center;
-    justify-content: center;
-    margin-left: max(280px, 10vw);
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  margin-left: max(280px, 10vw);
+}
+
+.party-title {
+  position: absolute;
+  top: 30px;
+  font-size: 24px;
+}
+
+.party-timestamp {
+  font-size: 18px;
+  display: block;
+  position: absolute;
+  bottom: 30px;
+  font-size: 20px;
 }
 
 .party-message {
-    width:600px;
+  width: 600px;
 }
 
-
 .song {
-    max-width: 400px;
-    line-height: 30px;
-    text-align: center;
-    margin: 0 auto;
+  max-width: 400px;
+  line-height: 30px;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .nav__mobile {
-    display: none;
-    align-items: center;
-    position: absolute;
-    padding: 2rem 2rem;
-    justify-content: space-between;
-    margin:0 auto;left:0;right:0;
+  display: none;
+  align-items: center;
+  position: absolute;
+  padding: 2rem 2rem;
+  justify-content: space-between;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
 }
-
 
 .link--leave-mobile {
-    cursor: pointer;
+  cursor: pointer;
 }
-    
-   
-
-
-
 
 @media (max-width: 768px) {
-    .party-page {
-        overflow: hidden;
-    }
+  .party-page {
+    overflow: hidden;
+  }
 
-    .nav__mobile {
-        display: flex;
-    }
+  .nav__mobile {
+    display: flex;
+  }
 
-    .party-contents {
-        margin-left: 0;
-    }
+  .party-contents {
+    margin-left: 0;
+  }
+
+  .party-title {
+    top: 26px;
+  }
+
+  .party-timestamp {
+    display: none;
+  }
 }

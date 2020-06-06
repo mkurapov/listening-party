@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Party, User, SocketEvent } from 'common'
 import { useHistory } from 'react-router';
 import Button from './Button';
 import socket from '../socket';
 import UserAvatar from './UserAvatar';
 import './Sidebar.css';
+import { User, SocketEvent, Party } from '../types';
 
 const AdminUser: React.FC<{ adminUser: User | undefined }> = ({ adminUser }): React.ReactElement => {
     if (!adminUser) {

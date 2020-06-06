@@ -1,7 +1,7 @@
 import React from 'react';
-import { PlaybackState } from 'common';
 
 import './Player.css';
+import { PlaybackState } from '../types';
 
 const Player: React.FC<{ playback: PlaybackState }> = ({ playback }): React.ReactElement => {
     const vals = [

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { SocketEvent, Party, User } from 'common'
 import Button from '../components/Button';
 import { useUser } from '../contexts/UserContext';
 import { APP_API } from '../const';
 import socket from '../socket';
 import Wiggle from '../components/Wiggle';
+import { User, SocketEvent, Party } from '../types';
 
 import './Home.css';
 
