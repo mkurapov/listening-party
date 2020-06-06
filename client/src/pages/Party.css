@@ -114,10 +114,7 @@
     margin-left: 0;
   }
 
-  .party-title {
-    top: 26px;
-  }
-
+  .party-title,
   .party-timestamp {
     display: none;
   }
