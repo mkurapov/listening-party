@@ -12,7 +12,8 @@ export class Socket {
   private server: http.Server;
 
   private partyMap = new Map<string, Party>();
-  private userMap = new Map<string, User>(); //socket id, user
+  private socketToUserMap = new Map<string, User>(); //socket id, user
+  private userMap = new Map<string, boolean>();
 
   private PLAYSTATE_POLL = 200;
 
@@ -26,9 +27,17 @@ export class Socket {
     this.io = socketio.listen(this.server, { origins: "*:*" });
     this.io.on("connection", (socket: socketio.Socket) => {
       console.log("Connected client on port:", port);
-      socket.on(SocketEvent.USER_LOGGEDIN_REQ, (userId) => {
-        this.userMap.set(socket.id, userId);
-        console.log("New user logged in ");
+      socket.on(SocketEvent.USER_LOGGEDIN_REQ, (user: User) => {
+        console.log(`New user with id ${user.id} logged in `);
+
+        if (this.userMap.get(user.id)) {
+          console.log(`${user.id} already logged in `);
+          this.io.to(socket.id).emit(SocketEvent.USER_ALREADY_CONNECTED_RES);
+          return;
+        }
+
+        this.socketToUserMap.set(socket.id, user);
+        this.userMap.set(user.id, true);
       });
 
       socket.on("disconnect", () => {
@@ -38,7 +47,7 @@ export class Socket {
       socket.on("disconnecting", () => {
         console.log("disconnecting");
         const partyId = Object.keys(socket.rooms).filter((room) => room != socket.id)[0];
-        const userToDisconnect = this.userMap.get(socket.id);
+        const userToDisconnect = this.socketToUserMap.get(socket.id);
         if (userToDisconnect) {
           socket.leave(partyId);
           console.log("userId:", userToDisconnect.id, " partyId: ", partyId);
@@ -50,12 +59,11 @@ export class Socket {
         const newParty: Party = {
           id: uuidv4(),
           users: [],
-          queue: [],
           createdAt: new Date(),
           playbackState: null,
         };
 
-        const partyCreator = this.userMap.get(socketId);
+        const partyCreator = this.socketToUserMap.get(socketId);
         newParty.adminUser = partyCreator;
 
         this.partyMap.set(newParty.id, newParty);
@@ -119,7 +127,7 @@ export class Socket {
 
       socket.on(SocketEvent.PARTY_PLAYBACK_REQ, ({ playbackState, partyId }: { playbackState: PlaybackState; partyId: string }) => {
         const currentParty = this.partyMap.get(partyId);
-        if (currentParty && playbackState) {
+        if (currentParty) {
           const updatedPartyState = { ...currentParty, playbackState };
           this.partyMap.set(partyId, updatedPartyState);
         }
@@ -145,7 +153,9 @@ export class Socket {
             }
           }
         }
-        this.userMap.delete(socket.id);
+
+        this.socketToUserMap.delete(socket.id);
+        this.userMap.delete(userIdToDisconnect);
       };
     });
   }
@@ -155,7 +165,7 @@ export class Socket {
       console.log(`m[${key}] = ${value}`);
     });
     const currentState = {
-      numUsers: this.userMap.size,
+      numUsers: this.socketToUserMap.size,
       numParties: this.partyMap.size,
     };
 

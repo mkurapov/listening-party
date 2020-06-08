@@ -11,50 +11,42 @@ import Sidebar from "../components/Sidebar";
 import UserAvatar from "../components/UserAvatar";
 import { useHistory } from "react-router";
 import Button from "../components/Button";
-import { PartyStub, Track, Party, SocketEvent, PlaybackState } from "../types";
+import { PartyStub, Track, Party, SocketEvent, PlaybackState, User, StubbedUsers } from "../types";
 
 interface Props {
   match: any;
 }
 
-interface SearchResults {
-  tracks: {
-    href: string;
-    items: Track[];
-  };
-}
+const OtherUsersAvatar: React.FC<{ count: number }> = ({ count }): React.ReactElement => {
+  return (
+    <span className="avatar">
+      <span className="avatar__placeholder">
+        <span className="avatar__placeholder__letter">+ {count}</span>
+      </span>
+    </span>
+  );
+};
 
-const UnauthedParty: React.FC<{ partyStub: PartyStub }> = ({ partyStub }): React.ReactElement => {
+const PartyStubComponent: React.FC<{ partyStub: PartyStub }> = ({ partyStub }) => {
   const USERS_TO_SHOW = 5;
-  console.log(partyStub);
 
-  const partyInfo = (): string => {
-    if (partyStub && partyStub.users) {
-      let personInfo;
-      if (partyStub.users.length === 1) {
-        personInfo = `1 person in the party is`;
-      } else {
-        personInfo = `${partyStub.users.length} people in the party are`;
-      }
-      const songArtist = partyStub.playbackState?.item.artists[0].name;
-      return `${personInfo} listening to ${songArtist ? songArtist : "some great tunes."}`;
-    }
-    return "";
-  };
-
-  const unslicedUsersView = () => {
-    return partyStub?.users?.map((user, i) => (
-      <div key={i} className="user--unauthed mr-1">
-        <UserAvatar user={user} />
-        <span className="user__info--unauthed mt-2">{user.display_name}</span>
-      </div>
-    ));
-  };
-
-  const slicedUsersView = () => {
+  const UnslicedUsers = () => {
     return (
       <div>
-        {partyStub.users?.slice(0, USERS_TO_SHOW - 1).map((user, i) => (
+        {partyStub.users.map((user, i) => (
+          <div key={i} className="user--unauthed mr-1">
+            <UserAvatar user={user} />
+            <span className="user__info--unauthed mt-2">{user.display_name}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const SlicedUsers = () => {
+    return (
+      <div>
+        {partyStub.users.slice(0, USERS_TO_SHOW - 1).map((user, i) => (
           <div className="user--unauthed mr-1">
             <UserAvatar key={i} user={user} />
             <span className="user__info--unauthed mt-2">{user.display_name}</span>
@@ -68,10 +60,22 @@ const UnauthedParty: React.FC<{ partyStub: PartyStub }> = ({ partyStub }): React
     );
   };
 
+  const PartyInfo = () => {
+    let personInfo;
+    if (partyStub.users.length === 1) {
+      personInfo = `1 person in the party is`;
+    } else {
+      personInfo = `${partyStub.users.length} people in the party are`;
+    }
+    const songArtist = partyStub.playbackState?.item.artists[0].name;
+
+    return <div className="text--lg mb-4">{`${personInfo} listening to ${songArtist ? songArtist : "some great tunes."}`}</div>;
+  };
+
   return (
     <div>
-      <div className="text--lg mb-4">{partyInfo()}</div>
-      <div className="users--unauthed mb-4">{partyStub.users.length > USERS_TO_SHOW ? slicedUsersView() : unslicedUsersView()}</div>
+      <PartyInfo />
+      <div className="users--unauthed mb-4">{partyStub.users.length > USERS_TO_SHOW ? <SlicedUsers /> : <UnslicedUsers />}</div>
       <a className="btn btn--primary d-block" href={APP_API.LOGIN}>
         Join them with Spotify
       </a>
@@ -79,21 +83,81 @@ const UnauthedParty: React.FC<{ partyStub: PartyStub }> = ({ partyStub }): React
   );
 };
 
-const OtherUsersAvatar: React.FC<{ count: number }> = ({ count }): React.ReactElement => {
+const UnauthedParty: React.FC<{ partyStub: PartyStub | undefined; loginError: string | undefined }> = ({
+  partyStub,
+  loginError,
+}): React.ReactElement => {
   return (
-    <span className="avatar">
-      <span className="avatar__placeholder">
-        <span className="avatar__placeholder__letter">+ {count}</span>
-      </span>
-    </span>
+    <div className="party--unauthed">
+      <Wiggle />
+      <div>
+        {loginError ? (
+          <div className="text--lg party-message">You are already connected somewhere else. Please check another open Spotify Music Party tab.</div>
+        ) : partyStub ? (
+          <PartyStubComponent partyStub={partyStub} />
+        ) : (
+          <div className="text--lg party-message">Not a live party. Returning home...</div>
+        )}
+      </div>
+      <div className="party--unauthed__footer">
+        <div className="mb-3">
+          <Wiggle />
+        </div>
+        <a className="link" href="/">
+          go to the home page
+        </a>
+      </div>
+    </div>
+  );
+};
+
+const AuthedParty: React.FC<{ currentParty: Party; user: User; error: string | null }> = ({ currentParty, user, error }): React.ReactElement => {
+  const [copyLinkBtnText, setCopyLinkBtnText] = useState("Copy invite link");
+  const history = useHistory();
+
+  const onCopyLink = (): void => {
+    const dummy = document.createElement("input"),
+      text = window.location.href;
+
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+    setCopyLinkBtnText("Copied! 🎉");
+    setTimeout(() => {
+      setCopyLinkBtnText("Copy invite link");
+    }, 3000);
+  };
+
+  return (
+    <div>
+      <div className="nav__mobile">
+        <a className="link link--leave-mobile text-center" onClick={() => history.push("/")}>
+          Leave party
+        </a>
+        <Button classes="btn--sm btn--primary" name={copyLinkBtnText} onClick={onCopyLink}></Button>
+      </div>
+      <div className="party-contents">
+        {currentParty.playbackState ? (
+          <>
+            <div className="party-title">Spotify Music Party</div>
+            <Player playback={currentParty.playbackState} />
+          </>
+        ) : (
+          <div className="text--lg party-message">{error ?? "Loading..."}</div>
+        )}
+      </div>
+
+      <Sidebar party={currentParty} user={user} />
+    </div>
   );
 };
 
 const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
-  const { user, isLoading } = useUser();
+  const { user, isLoading: isLoadingUser, error: loginError } = useUser();
   const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
-  const [copyLinkBtnText, setCopyLinkBtnText] = useState("Copy invite link");
-  const [timestamp, setTimestamp] = useState("");
+  const [isLoadingParty, setIsLoadingParty] = useState<boolean>(true);
 
   const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
   const partyId = match.params.id;
@@ -103,7 +167,6 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
   const errorMessageRef = useRef<string | null>(null);
 
   const intervalRef = useRef<any>(null);
-  const timestampIntervalRef = useRef<any>(null);
 
   const DJ_POLL_TIME = 1000;
 
@@ -123,12 +186,17 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
   const isAdminUser = (): boolean => user?.id === currentPartyRef.current?.adminUser?.id;
 
   useEffect(() => {
-    if (!user || isLoading) {
-      if (!isLoading) {
+    if (!user || isLoadingUser) {
+      if (!isLoadingUser) {
         console.log("You are not authed");
         localStorage.setItem("pending_party", partyId);
         socket.emit(SocketEvent.PARTY_JOINED_UNAUTHED_REQ, partyId);
+        setIsLoadingParty(false);
       }
+      return;
+    }
+
+    if (loginError) {
       return;
     }
 
@@ -136,11 +204,10 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
 
     socket.emit(SocketEvent.PARTY_JOINED_REQ, { user: user, socketId: socket.id, partyId: partyId });
     socket.on(SocketEvent.PARTY_POLL, onPartyPoll);
-    startPollingTimestamp();
-  }, [user, isLoading]);
+  }, [user, isLoadingUser]);
 
   const onPartyPoll = (party: Party) => {
-    console.log("polling party: ", party);
+    // console.log("polling party: ", party);
     if (party.adminUser?.id === user?.id) {
       startPollingCurrentlyPlaying(party.id);
     } else if (party.playbackState) {
@@ -155,7 +222,11 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         pauseSong();
       }
     }
+
     setCurrentParty(party);
+    if (isLoadingParty) {
+      setIsLoadingParty(false);
+    }
   };
 
   const onPartyExistsCheck = (hasParty: boolean) => {
@@ -252,7 +323,10 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
       .then((res: AxiosResponse<PlaybackState>) => {
         if (!res.data || !res.data.item) {
           console.log("Nothing is playing, its an ad, or you are in private mode.");
-          errorMessageRef.current = isAdminUser ? "Nothing is playing on your Spotify device, or you are listening in private mode." : "Nothing is playing. Ask your DJ to play some music.";
+          socket.emit(SocketEvent.PARTY_PLAYBACK_REQ, { playbackState: undefined, partyId: partyId });
+          errorMessageRef.current = isAdminUser
+            ? "Nothing is playing on your Spotify device, or you are listening in private mode."
+            : "Nothing is playing. Ask your DJ to play some music.";
           return;
         }
 
@@ -266,84 +340,20 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
       });
   };
 
-  const searchSong = (query: string): Promise<AxiosResponse<SearchResults>> => {
-    return axios.get(SPOTIFY_API.SEARCH, { params: { type: "track", q: query.replace(" ", "+") } });
-  };
-
-  const onCopyLink = (): void => {
-    const dummy = document.createElement("input"),
-      text = window.location.href;
-
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-    setCopyLinkBtnText("Copied! 🎉");
-    setTimeout(() => {
-      setCopyLinkBtnText("Copy invite link");
-    }, 3000);
-  };
-
-  const startPollingTimestamp = () => {
-    if (timestampIntervalRef.current !== null) {
-      return;
-    }
-    timestampIntervalRef.current = setInterval(() => {
-      calcTimestamp();
-    }, 1000);
-  };
-
-  const calcTimestamp = () => {
-    if (currentPartyRef.current?.createdAt) {
-      const msInParty = Math.abs(new Date().getTime() - new Date(currentPartyRef.current.createdAt).getTime());
-      let secs = msInParty / 1000;
-
-      let minutes = Math.floor(secs / 60);
-      secs = secs % 60;
-      let hours = minutes / 60;
-      minutes = minutes % 60;
-
-      const displayHours = Math.floor(hours);
-      const displayMinutes = String(Math.floor(minutes)).padStart(2, "0");
-      const displaySeconds = String(Math.floor(secs)).padStart(2, "0");
-
-      setTimestamp(`${displayHours}:${displayMinutes}:${displaySeconds}`);
-    }
-  };
-
   return (
     <div className="party-page">
-      {errorMessageRef.current}
-      {user && !isLoading && currentParty ? (
+      {isLoadingUser || isLoadingParty ? (
         <div>
-          <div className="nav__mobile">
-            <a className="link link--leave-mobile text-center" onClick={() => history.push("/")}>
-              Leave party
-            </a>
-            <Button classes="btn--sm btn--primary" name={copyLinkBtnText} onClick={onCopyLink}></Button>
+          <div className="party--unauthed">
+            <Wiggle />
+            <div className="text--lg">Loading...</div>
+            <Wiggle />
           </div>
-          <div className="party-contents">
-            <div className="party-title">Spotify Music Party</div>
-            {currentParty.playbackState ? <Player playback={currentParty.playbackState} /> : <div className="text--lg party-message">{errorMessageRef.current}</div>}
-            <div className="party-timestamp">{timestamp}</div>
-          </div>
-
-          <Sidebar party={currentParty} user={user} />
         </div>
+      ) : user && currentParty && !loginError ? (
+        <AuthedParty user={user} currentParty={currentParty} error={errorMessageRef.current} />
       ) : (
-        <div className="party--unauthed">
-          <Wiggle />
-          {partyStub ? <UnauthedParty partyStub={partyStub} /> : <div>{errorMessageRef.current}</div>}
-          <div className="party--unauthed__footer">
-            <div className="mb-3">
-              <Wiggle />
-            </div>
-            <a className="link" href="/">
-              go to the home page
-            </a>
-          </div>
-        </div>
+        <UnauthedParty partyStub={partyStub} loginError={loginError} />
       )}
     </div>
   );

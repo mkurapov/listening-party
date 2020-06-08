@@ -17,7 +17,6 @@ export interface PartyStub {
 export interface Party {
   users?: User[];
   id: string;
-  queue?: Song[];
   adminUser?: User;
   createdAt?: Date;
   playbackState?: PlaybackState;
@@ -86,4 +85,5 @@ export enum SocketEvent {
   PARTY_ADD_TO_QUEUE_RES = "PARTY_ADD_TO_QUEUE_RES",
   PARTY_POLL = "PARTY_POLL",
   TEST = "TEST",
+  USER_ALREADY_CONNECTED_RES = "USER_ALREADY_CONNECTED_RES",
 }

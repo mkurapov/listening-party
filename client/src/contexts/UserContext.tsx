@@ -21,17 +21,20 @@ interface RefreshAccessTokenResponse {
 export interface UserContext {
   user: User | undefined;
   isLoading: boolean;
+  error: string | undefined;
   logout: () => void;
 }
 
 const UserContext = createContext<UserContext>({
   user: undefined,
   isLoading: false,
+  error: undefined,
   logout: () => {},
 });
 
 const UserProvider: React.FC = ({ children }): React.ReactElement => {
   const [user, setUser] = useState<User>();
+  const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
   let storedUser: string | null;
@@ -60,6 +63,7 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
 
   useEffect(() => {
     console.log("Checking login...");
+    socket.on(SocketEvent.USER_ALREADY_CONNECTED_RES, userAlreadyConnected);
 
     storedUser = localStorage.getItem("user");
     storedAccessToken = localStorage.getItem("access_token");
@@ -155,11 +159,16 @@ const UserProvider: React.FC = ({ children }): React.ReactElement => {
     axios.defaults.headers.common["Authorization"] = "Bearer " + accessToken;
   };
 
+  const userAlreadyConnected = () => {
+    setError("User already connected");
+  };
+
   const SettingsContext = useMemo(
     () => ({
       user,
       isLoading,
       logout,
+      error,
     }),
     [user, logout]
   );

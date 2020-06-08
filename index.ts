@@ -1,6 +1,6 @@
 import { Server } from "./app/server";
 import { Socket } from "./app/socket";
-import express from 'express';
+import express from "express";
 const app = express();
 
 const port: string | number = process.env.PORT || 8080;

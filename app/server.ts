@@ -13,20 +13,14 @@ import querystring from "query-string";
 import { generateRandomString } from "./helpers";
 
 const DB_NAME = process.env.NODE_ENV === "production" ? "prod" : "dev";
-const BUILD_DIR =
-  process.env.NODE_ENV === "production"
-    ? path.normalize(__dirname + "/..")
-    : path.normalize(__dirname + "/..");
+const BUILD_DIR = process.env.NODE_ENV === "production" ? path.normalize(__dirname + "/..") : path.normalize(__dirname + "/../build");
 const FE_PATH = path.join(BUILD_DIR, "/client");
 const SPOTIFY_ACCOUNT_URL = "https://accounts.spotify.com";
 
 const SPOTIFY_AUTH_URL = SPOTIFY_ACCOUNT_URL + "/authorize";
 const SPOTIFY_TOKEN_URL = SPOTIFY_ACCOUNT_URL + "/api/token";
 
-const REDIRECT_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://spotifymusic.party/callback"
-    : "http://localhost:8080/callback";
+const REDIRECT_URL = process.env.NODE_ENV === "production" ? "https://spotifymusic.party/callback" : "http://localhost:8080/callback";
 
 interface SpotifyTokenResponse {
   access_token: string;
@@ -60,9 +54,7 @@ export class Server {
     this.port = port;
     this.setUpDb();
 
-    return this.app.listen(port, () =>
-      console.log(`Server listening on port ${port}!`)
-    );
+    return this.app.listen(port, () => console.log(`Server listening on port ${port}!`));
   }
 
   private setUpDb = async () => {
@@ -78,12 +70,7 @@ export class Server {
     const state = generateRandomString(16);
     res.cookie(this.stateKey, state);
 
-    const scopes = [
-      "user-read-private",
-      "user-modify-playback-state",
-      "user-read-currently-playing",
-      "user-read-playback-state",
-    ];
+    const scopes = ["user-read-private", "user-modify-playback-state", "user-read-currently-playing", "user-read-playback-state"];
     const authURL =
       SPOTIFY_AUTH_URL +
       "?" +

@@ -9,8 +9,10 @@ export interface User {
   ];
 }
 
+export type StubbedUsers = Pick<User, "display_name" | "images">;
+
 export interface PartyStub {
-  users: Pick<User, "display_name" | "images">[];
+  users: StubbedUsers[];
   playbackState: Pick<PlaybackState, "item">;
 }
 
@@ -86,4 +88,5 @@ export enum SocketEvent {
   PARTY_ADD_TO_QUEUE_RES = "PARTY_ADD_TO_QUEUE_RES",
   PARTY_POLL = "PARTY_POLL",
   TEST = "TEST",
+  USER_ALREADY_CONNECTED_RES = "USER_ALREADY_CONNECTED_RES",
 }
