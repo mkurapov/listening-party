@@ -159,8 +159,6 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
   const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
   const [isLoadingParty, setIsLoadingParty] = useState<boolean>(true);
 
-  const eventListeners: SocketIOClient.Emitter[] = [];
-
   const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
   const partyId = match.params.id;
   const history = useHistory();

@@ -6,7 +6,7 @@ import cors from "cors";
 import axios, { AxiosResponse } from "axios";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import { connect, State as StateModel } from "./database";
+import { connect, State as StateModel, StateObject } from "./database";
 dotenv.config();
 
 import querystring from "query-string";
@@ -157,10 +157,16 @@ export class Server {
   };
 
   public getInfo = async (_: Request, res: Response): Promise<void> => {
-    const currentState = await StateModel.findOne().sort({
-      createdAt: -1,
-    });
+    const currentState = await StateModel.findOne()
+      .sort({
+        createdAt: -1,
+      })
+      .lean<StateObject>()
+      .exec();
 
-    res.send(currentState);
+    res.send({
+      numParties: currentState.numParties,
+      numUsers: currentState.numUsers,
+    });
   };
 }
