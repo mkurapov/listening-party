@@ -6,7 +6,7 @@ import cors from "cors";
 import axios, { AxiosResponse } from "axios";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import * as database from "./database";
+import { connect, State as StateModel } from "./database";
 dotenv.config();
 
 import querystring from "query-string";
@@ -58,7 +58,7 @@ export class Server {
   }
 
   private setUpDb = async () => {
-    await database.connect(process.env.MONGO_DB, {
+    await connect(process.env.MONGO_DB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       dbName: DB_NAME,
@@ -157,9 +157,10 @@ export class Server {
   };
 
   public getInfo = async (_: Request, res: Response): Promise<void> => {
-    const currentState = await database.StateModel.findOne().sort({
+    const currentState = await StateModel.findOne().sort({
       createdAt: -1,
     });
+
     res.send(currentState);
   };
 }

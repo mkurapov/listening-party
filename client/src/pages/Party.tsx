@@ -159,6 +159,8 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
   const [currentParty, setCurrentParty] = useState<Party | undefined>(undefined);
   const [isLoadingParty, setIsLoadingParty] = useState<boolean>(true);
 
+  const eventListeners: SocketIOClient.Emitter[] = [];
+
   const [partyStub, setCurrentPartyStub] = useState<PartyStub | undefined>(undefined);
   const partyId = match.params.id;
   const history = useHistory();
@@ -248,9 +250,9 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
   const handleUserLeaving = () => {
     socket.emit(SocketEvent.USER_LEFT_PARTY_REQ, { userId: user?.id, partyId: partyId });
 
-    socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES, onPartyJoinedUnauthed);
-    socket.off(SocketEvent.PARTY_POLL, onPartyPoll);
-    socket.off(SocketEvent.PARTY_EXISTS_CHECK_RES, onPartyExistsCheck);
+    socket.off(SocketEvent.PARTY_JOINED_UNAUTHED_RES);
+    socket.off(SocketEvent.PARTY_POLL);
+    socket.off(SocketEvent.PARTY_EXISTS_CHECK_RES);
     stopPollingCurrentlyPlaying();
 
     console.log("Leaving party.");
@@ -324,7 +326,7 @@ const PartyPage: React.FC<Props> = ({ match }): React.ReactElement => {
         if (!res.data || !res.data.item) {
           console.log("Nothing is playing, its an ad, or you are in private mode.");
           socket.emit(SocketEvent.PARTY_PLAYBACK_REQ, { playbackState: undefined, partyId: partyId });
-          errorMessageRef.current = isAdminUser
+          errorMessageRef.current = isAdminUser()
             ? "Nothing is playing on your Spotify device, or you are listening in private mode."
             : "Nothing is playing. Ask your DJ to play some music.";
           return;
