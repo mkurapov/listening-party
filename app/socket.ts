@@ -169,7 +169,7 @@ export class Socket {
   public start(): void {
     this.recoverState();
 
-    cron.schedule("*/5 * * * * *", () => {
+    cron.schedule("*/30 * * * * *", () => {
       this.saveState();
     });
   }
@@ -184,6 +184,7 @@ export class Socket {
       for (let party of savedState.parties as Party[]) {
         party.users = [];
         party.adminUser = undefined;
+        party.playbackState = undefined;
 
         this.partyMap.set(party.id, party);
         this.startEmittingToParty(party.id);
@@ -191,11 +192,15 @@ export class Socket {
     }
   }
 
-  private saveState(): void {
+  private async saveState(): Promise<void> {
     const numUsers = this.socketToUserMap.size;
     const numParties = this.partyMap.size;
 
-    console.log("***** saving state *****");
+    const prevState = await StateModel.findOne().sort({ createdAt: -1 }).lean<StateObject>().exec();
+
+    if (prevState.numParties === numParties) {
+      return;
+    }
 
     const parties = [];
     this.partyMap.forEach((party) => {
