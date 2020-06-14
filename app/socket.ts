@@ -206,6 +206,8 @@ export class Socket {
     });
 
     const state = new StateModel({
+      numUsers,
+      numParties,
       parties,
     });
     state.save();
