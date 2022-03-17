@@ -1,3 +1,3 @@
 # listening-party
 
-https://spotifymusic.party/
+https://listeningpartey.herokuapp.com/
