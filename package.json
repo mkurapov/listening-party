@@ -10,7 +10,7 @@
     "@types/mongoose": "^5.7.20",
     "@types/node-cron": "^2.0.3",
     "@types/socket.io": "^2.1.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
